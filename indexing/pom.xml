@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>edu.virginia.lib.ole.esb</groupId>
+    <artifactId>indexing</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>Indexing workflow</name>
+    <url>http://www.lib.virginia.edu</url>
+
+    <developers>
+        <developer>
+            <id>ajs6f</id>
+            <name>A. Soroka</name>
+            <email>ajs6f@virginia.edu</email>
+            <organization>the University of Virginia Library :: OLE</organization>
+            <organizationUrl>http://www.lib.virginia.edu</organizationUrl>
+            <timezone>EST</timezone>
+            <roles>
+                <role>Creator</role>
+            </roles>
+        </developer>
+    </developers>
+    <organization>
+        <name>the University of Virginia Library :: OLE</name>
+    </organization>
+
+    <repositories>
+        <repository>
+            <id>Fuse</id>
+            <name>Fuse Release Repository</name>
+            <url>http://repo.fusesource.com/nexus/content/groups/public</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <releases>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>Apache Ordinary</id>
+            <name>Apache Ordinary (non-snapshot)</name>
+            <url>https://repository.apache.org/content/groups/public/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <releases>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>Apache Ordinary</id>
+            <name>Apache Ordinary (non-snapshot)</name>
+            <url>https://repository.apache.org/content/groups/public/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>Fuse</id>
+            <name>Fuse Release Repository</name>
+            <url>http://repo.fusesource.com/nexus/content/groups/public</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <!-- <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <archive>  
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+                </plugin> -->
+            
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.3.4</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Import-Package>*</Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+            </plugin>  
+            <!-- 
+            <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>features-maven-plugin</artifactId>
+                <version>2.2.2</version>
+                <executions>
+                    <execution>
+                        <id>generate</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate-features-xml</goal>
+                        </goals> 
+                        <configuration>
+                            <bundles>src/main/resources/bundles.properties</bundles>
+                            <kernelVersion>2.2.2</kernelVersion>
+                            <outputFile>target/features.xml</outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+             -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+        </plugins>
+    </build>
+    
+    <modules>
+        <module>indexing-camel-router</module>
+        <module>solr-http-provider</module>
+        <module>single-datastream-xslt</module>
+        <module>getIndexMetadata-http-consumer</module>
+    <module>splitRDFDescriptions-xslt</module>
+    <module>mergeAndDeduplicateSolr-xslt</module>
+    <module>concretizeURIs-xslt</module>
+  </modules>
+    
+</project>

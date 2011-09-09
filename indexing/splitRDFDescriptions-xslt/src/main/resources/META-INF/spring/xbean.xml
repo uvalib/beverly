@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:indexing="indexing"
+  xmlns:saxon="http://servicemix.apache.org/saxon/1.0"
+  xsi:schemaLocation="http://servicemix.apache.org/saxon/1.0 http://repo.open.iona.com/maven2/org/apache/servicemix/servicemix-saxon/2011.01.0-fuse-00-00/servicemix-saxon-2011.01.0-fuse-00-00.xsd
+  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+    
+  <saxon:xslt service="indexing:splitRDFDescriptions"
+      resource="classpath:transform.xsl" endpoint="transform"/>
+    
+    <bean class="org.apache.servicemix.common.osgi.EndpointExporter"/>    
+  
+</beans>
