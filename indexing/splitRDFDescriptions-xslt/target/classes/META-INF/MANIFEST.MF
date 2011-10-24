@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Private-Package: .
+Built-By: ajs6f
+Tool: Bnd-0.0.311
+Bundle-Name: An XSLT based Service to transform RDF
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: the University of Virginia Library :: OLE
+Build-Jdk: 1.6.0_26
+Bundle-Version: 1.0.0.SNAPSHOT
+Bnd-LastModified: 1318970569792
+Bundle-ManifestVersion: 2
+Bundle-Description: An XSLT based Service to transform RDF and split D
+ escriptions containing more than one predicate into independent Descr
+ iptions
+Import-Package: org.apache.servicemix.common.osgi;version="2010.2",org
+ .apache.servicemix.expression,org.apache.servicemix.saxon;version="20
+ 10.2"
+Bundle-SymbolicName: splitRDFDescriptions-xslt
+

@@ -1,0 +1,10 @@
+type=triples&format=RDF/XML&lang=sparql&query=
+
+PREFIX uva-lib: <http://www.lib.virginia.edu/ole/repository-relationships/>
+
+construct { ?datastream <uva-lib:isIndexedBy> ?xslt . }
+WHERE
+{
+  <info:fedora/changeme:1> <fedora-view:disseminates> ?datastream .
+  ?datastream <uva-lib:isIndexedBy>  ?xslt .
+}  

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>repository-connectivity</artifactId>
+		<groupId>edu.virginia.lib.ole.esb</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<groupId>edu.virginia.lib.ole.esb.repository</groupId>
+	<artifactId>jms-listener</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>bundle</packaging>
+	<name>JMS consumer for repository listening</name>
+	<url>http://www.lib.virginia.edu</url>
+
+	<developers>
+		<developer>
+			<id>ajs6f</id>
+			<name>A. Soroka</name>
+			<email>ajs6f@virginia.edu</email>
+			<organization>the University of Virginia Library :: OLE</organization>
+			<organizationUrl>http://www.lib.virginia.edu</organizationUrl>
+			<timezone>EST</timezone>
+			<roles>
+				<role>Creator</role>
+			</roles>
+		</developer>
+	</developers>
+	<organization>
+		<name>the University of Virginia Library :: OLE</name>
+	</organization>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.servicemix</groupId>
+			<artifactId>servicemix-jms</artifactId>
+			<version>2011.02.1-fuse-00-08</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.0.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Import-Package>org.apache.servicemix.jms,org.apache.servicemix.common.osgi,*</Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

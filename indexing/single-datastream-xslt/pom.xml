@@ -7,9 +7,8 @@
     <groupId>edu.virginia.lib.ole.esb</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <groupId>edu.virginia.lib.ole.esb</groupId>
+  <groupId>edu.virginia.lib.ole.esb.indexing</groupId>
   <artifactId>single-datastream-xslt</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
   <name>Single-datastream Saxon/XSLT service unit </name>
   <description>A  Saxon/XSLT service unit to process the metadata in a single object datastream, running against the RDF description of that datastrem in RELS-INT</description>

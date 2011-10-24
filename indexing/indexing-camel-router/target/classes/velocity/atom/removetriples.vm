@@ -1,0 +1,14 @@
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:fedora-types="http://www.fedora.info/definitions/1/0/types/"
+       xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <author>
+    <name>indexing</name>
+    <uri>${headers.repositoryURL}</uri>
+  </author>
+  <title type="text">purgeRelationship</title>
+  <category term="${headers.subject}" scheme="fedora-types:subject" label="xsd:string"/>
+  <category term="http://fedora.lib.virginia.edu/relationships#isIndexedBy" scheme="fedora-types:relationship" label="xsd:string"/>
+  <category term="info:fedora/${headers.pid}/XSLT" scheme="fedora-types:object" label="xsd:string"/>
+  <category term="false" scheme="fedora-types:isLiteral" label="xsd:boolean"/>
+ 
+</entry>

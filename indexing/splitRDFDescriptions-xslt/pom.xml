@@ -7,9 +7,8 @@
     <groupId>edu.virginia.lib.ole.esb</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <groupId>edu.virginia.lib.ole.esb</groupId>
+  <groupId>edu.virginia.lib.ole.esb.indexing</groupId>
   <artifactId>splitRDFDescriptions-xslt</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
   <name>An XSLT based Service to transform RDF</name>
   <description>An XSLT based Service to transform RDF and split Descriptions containing more than one predicate into independent Descriptions</description>

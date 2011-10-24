@@ -6,10 +6,9 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>edu.virginia.lib.ole.esb</groupId>
+  <groupId>edu.virginia.lib.ole.esb.indexing</groupId>
   <artifactId>getIndexMetadata-http-consumer</artifactId>
   <packaging>bundle</packaging>
-  <version>1.0-SNAPSHOT</version>
   <name>HTTP Service Unit supporting getIndexMetadata</name>
   <url>http://www.lib.virginia.edu</url>
 

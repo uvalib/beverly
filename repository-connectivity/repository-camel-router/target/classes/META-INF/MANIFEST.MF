@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Private-Package: !*
+Built-By: ajs6f
+Tool: Bnd-0.0.311
+Bundle-Name: A Camel-based router for repository connectivity
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: the University of Virginia Library :: OLE
+Bundle-Version: 1.0.0.SNAPSHOT
+Build-Jdk: 1.6.0_26
+Bnd-LastModified: 1319044177842
+Bundle-ManifestVersion: 2
+Import-Package: org.apache.servicemix.camel.nmr,org.apache.servicemix.
+ nmr.api
+Bundle-SymbolicName: repository-camel-router
+
