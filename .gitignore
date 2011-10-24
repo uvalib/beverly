@@ -1,17 +1,19 @@
 # Maven produce #
 #################
-target
+target/
+
 
 # Eclipse jazz #
 ################
 bin
-.project
-.settings
-.classpath
+\.project
+\.settings
+\.classpath
 
 # Compiled source #
 ###################
 *.com
+*.jar
 *.class
 *.dll
 *.exe

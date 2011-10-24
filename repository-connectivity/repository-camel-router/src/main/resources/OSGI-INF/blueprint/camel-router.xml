@@ -75,13 +75,6 @@
         
     </camelContext>
     
-    <!--
-    <bean id="nmr" class="org.apache.servicemix.camel.nmr.ServiceMixComponent">
-        <property name="nmr">
-            <reference interface="org.apache.servicemix.nmr.api.NMR" />
-        </property>
-    </bean>
-    
-    -->
+  
     
 </blueprint>
