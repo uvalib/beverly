@@ -1,3 +1,0 @@
-<delete>
-	<id>${headers.pid}</id>
-</delete>
