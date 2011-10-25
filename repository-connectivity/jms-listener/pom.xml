@@ -10,33 +10,21 @@
 	</parent>
 	<groupId>edu.virginia.lib.ole.esb.repository</groupId>
 	<artifactId>jms-listener</artifactId>
-	<version>1.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>JMS consumer for repository listening</name>
 	<url>http://www.lib.virginia.edu</url>
-
-	<developers>
-		<developer>
-			<id>ajs6f</id>
-			<name>A. Soroka</name>
-			<email>ajs6f@virginia.edu</email>
-			<organization>the University of Virginia Library :: OLE</organization>
-			<organizationUrl>http://www.lib.virginia.edu</organizationUrl>
-			<timezone>EST</timezone>
-			<roles>
-				<role>Creator</role>
-			</roles>
-		</developer>
-	</developers>
-	<organization>
-		<name>the University of Virginia Library :: OLE</name>
-	</organization>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.servicemix</groupId>
 			<artifactId>servicemix-jms</artifactId>
 			<version>2011.02.1-fuse-00-08</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-osgi</artifactId>
+			<version>1.2.1</version>
+			<type>pom</type>
 		</dependency>
 	</dependencies>
 
@@ -53,11 +41,11 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.0.0</version>
+				<version>2.3.5</version>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Import-Package>org.apache.servicemix.jms,org.apache.servicemix.common.osgi,*</Import-Package>
+						<Import-Package>org.apache.servicemix.jms.endpoints,org.apache.servicemix.common.osgi,*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
