@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns:saxon="http://servicemix.apache.org/saxon/1.0" xmlns:indexing="indexing"
+<beans xmlns:saxon="http://servicemix.apache.org/saxon/1.0" xmlns:indexing="urn:lib:indexing"
   xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://servicemix.apache.org/saxon/1.0 http://servicemix.apache.org/schema/servicemix-saxon-2009.01.xsd

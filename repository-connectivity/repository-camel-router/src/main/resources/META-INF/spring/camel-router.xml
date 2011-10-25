@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
+    http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+    
+    <description> Router for repository connectivity. </description>
+    
+    <camelContext id="repoconnector" xmlns="http://camel.apache.org/schema/spring"
+       xmlns:atom="http://www.w3.org/2005/Atom">
+
+        <route>
+            <from uri="jbi:service:urn:lib:repositories:messaging"/>
+            <setHeader headerName="repositoryURL">
+                <xpath resultType="java.lang.String">/atom:entry/atom:author/atom:uri</xpath>
+            </setHeader>
+            <to uri="nmr:service:indexing:index"/>
+        </route>
+        
+        <route>
+            <from uri="nmr:service:repositories:api-a"/>
+            <enrich uri="jbi:service:urn:lib:repositories:atomtosoap"/>
+            
+            <setHeader headerName="SOAPAction">
+                <constant/>
+            </setHeader>
+            <!-- override with repositoryURL -->
+            <setHeader headerName="CamelHttpUri">
+                <simple>${headers.repositoryURL}/services/access</simple>
+            </setHeader>
+            <!-- Fedora, for some odd reason, requires a set SOAPAction header without using it -->
+            <setHeader headerName="SOAPAction">
+                <constant>dummy</constant>
+            </setHeader>
+            <log message="Sending SOAP message to repository: in.body = ${in.body} and out.body = ${out.body}"/>
+            
+            <!-- default repo API-A url -->
+            <to
+                uri="http:fedora/services/access?authMethod=Basic&amp;authUsername=fedoraAdmin&amp;authPassword=fedoraAdmin"/>
+            <removeHeader headerName="SOAPAction"/>
+            <removeHeader headerName="CamelHttpUri"/>
+        </route>
+        
+        <route>
+            <from uri="nmr:service:repositories:api-m"/>
+            <to uri="nmr:service:atomtosoap"/>
+            <!-- Fedora, for some odd reason, requires a set SOAPAction header without using it -->
+            <setHeader headerName="SOAPAction">
+                <constant>dummy</constant>
+            </setHeader>
+            <!-- override with repositoryURL -->
+            <setHeader headerName="CamelHttpUri">
+                <simple>${headers.repositoryURL}/services/management?httpClient.authenticationPreemptive=true&amp;username=fedoraAdmin&amp;password=fedoraAdmin</simple>
+            </setHeader>
+            <!-- default repo API-A url -->
+            <to uri="http:fedora/services/management"/>
+            <removeHeader headerName="SOAPAction"/>
+            <removeHeader headerName="CamelHttpUri"/>
+        </route>
+        
+        <route>
+            <from uri="nmr:service:repositories:resource-index"/>
+            <setHeader headerName="Content-Type">
+                <constant>application/x-www-form-urlencoded</constant>
+            </setHeader>
+            <setHeader headerName="CamelHttpChunked">
+                <constant>false</constant>
+            </setHeader>
+            <setHeader headerName="CamelHttpMethod">
+                <constant>POST</constant>
+            </setHeader>
+            <!-- override endpoint address with repositoryURL -->
+            <setHeader headerName="CamelHttpUri">
+                <simple>${headers.repositoryURL}/risearch</simple>
+            </setHeader>
+            <!-- default repo RI search url -->
+            <to uri="http:fedora/risearch"/>
+            <removeHeader headerName="Content-Type"/>
+            <removeHeader headerName="CamelHttpChunked"/>
+            <removeHeader headerName="CamelHttpUri"/>
+            <removeHeader headerName="CamelHttpMethod"/>
+        </route>
+        
+    </camelContext>
+
+</beans>

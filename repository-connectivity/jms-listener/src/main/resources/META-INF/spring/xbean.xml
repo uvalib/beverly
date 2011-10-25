@@ -1,27 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<beans xmlns:jms="http://servicemix.apache.org/jms/1.0"
-       xmlns:repositories="repositories"
-       xmlns:osgi="http://www.springframework.org/schema/osgi"
-       xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://servicemix.apache.org/jms/1.0 http://servicemix.apache.org/schema/servicemix-jms-2009.01.xsd
-       http://activemq.apache.org/schema/core https://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd
+<beans xmlns:jms="http://servicemix.apache.org/jms/1.0" xmlns:repositories="urn:lib:repositories"
+  xmlns:osgi="http://www.springframework.org/schema/osgi"
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://servicemix.apache.org/jms/1.0 http://servicemix.apache.org/schema/servicemix-jms-2009.01.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-    <jms:consumer service="repositories:jms-listener"
-                  endpoint="jms"
-                  targetService="repositories:api-m-jms"
-                  destinationName="queue/fedora.apim.update"
-                  connectionFactory="#connectionFactory">
-      <property name="connectionFactory">
-        <osgi:reference interface="javax.jms.ConnectionFactory"/>
-      </property>
-    </jms:consumer>
- <!--
-   <amq:connectionFactory xmlns:amq="http://activemq.apache.org/schema/core" id="connectionFactory" brokerURL="tcp://localhost:61616" />
--->
+  <jms:consumer service="repositories:jms-listener" 
+    endpoint="jms"  
+    targetService="repositories:messaging" 
+                destinationName="fedora.apim.update">
+    <property name="connectionFactory">
+      <osgi:reference interface="javax.jms.ConnectionFactory"/>
+    </property>
+  </jms:consumer>
+
   <bean class="org.apache.servicemix.common.osgi.EndpointExporter"/>
 
 </beans>

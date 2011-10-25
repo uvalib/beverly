@@ -65,7 +65,7 @@
 	        <extensions>true</extensions>
 	        <configuration>
 	          <instructions>
-	            <Import-Package>org.apache.servicemix.camel.nmr,org.apache.servicemix.nmr.api,*</Import-Package>
+	          	<Import-Package>org.apache.camel.component.velocity,org.apache.servicemix.camel.nmr,org.apache.servicemix.nmr.api,*</Import-Package>
 	          </instructions>
 	        </configuration>
 	    </plugin>
