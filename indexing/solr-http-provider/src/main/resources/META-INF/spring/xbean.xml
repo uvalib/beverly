@@ -14,7 +14,7 @@
       locationURI="${indexserviceurl}/update"/>
    
    <osgix:cm-properties id="preProps" persistent-id="edu.virginia.lib.ole.beverly.indexing">
-      <prop key="indexserviceurl">http://localhost:8080/solr</prop>
+      <prop key="indexserviceurl">http://mbusdev.lib.virginia.edu:8080/solr</prop>
    </osgix:cm-properties>
    
    <ctx:property-placeholder properties-ref="preProps" />
