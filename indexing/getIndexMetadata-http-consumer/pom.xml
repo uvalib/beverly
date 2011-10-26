@@ -22,7 +22,7 @@
     <dependency>
       <groupId>org.apache.servicemix</groupId>
       <artifactId>servicemix-http</artifactId>
-      <version>2010.02.0-fuse-00-00</version>
+      <version>2011.02.1-fuse-00-08</version>
     </dependency>
   </dependencies>
   
