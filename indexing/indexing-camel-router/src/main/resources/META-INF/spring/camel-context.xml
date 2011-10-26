@@ -115,11 +115,10 @@
       <removeHeader headerName="CamelHttpPath"/>
       <to uri="freemarker:freemarker/atom/listdatastreams.vm"/>
       <inOut uri="nmr:service:repositories:api-a"/>
+    <!--
       <choice>
         <when>
-          <!-- if there exists an indexing metadata datastream -->
           <xpath>//datastreamDef/ID = 'SOLR'</xpath>
-          <!-- grab it -->
           <setHeader headerName="libDatastream">
             <constant>SOLR</constant>
           </setHeader>
@@ -128,6 +127,7 @@
         </when>
         <otherwise>
           <description>Create indexing metadata from datastreams</description>
+          -->
           <to uri="freemarker:freemarker/sparql/getindexabledatastreams.vm"/>
           <inOut uri="nmr:service:repositories:resource-index"/>
           <!-- swap info:fedora/ stuff for dereferencable URLs -->
@@ -158,8 +158,10 @@
             <inOut uri="jbi:service:urn:lib:indexing:single-datastream-xslt"/>
           </split>
           <inOut uri="jbi:service:urn:lib:indexing:mergeAndDeduplicateSolr"/>
+      <!--
         </otherwise>
       </choice>
+      -->
     </route>
 
   </camelContext>
