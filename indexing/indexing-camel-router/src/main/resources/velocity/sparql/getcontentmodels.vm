@@ -1,9 +1,0 @@
-type=triples&format=RDF/XML&lang=sparql&query=
-
-PREFIX fedora-model: <info:fedora/fedora-system:def/model#>
-
-construct { <info:fedora/${headers.pid}> <fedora-model:hasModel> ?model . }
-WHERE
-{
-  <info:fedora/${headers.pid}> <fedora-model:hasModel> ?model .
-}  

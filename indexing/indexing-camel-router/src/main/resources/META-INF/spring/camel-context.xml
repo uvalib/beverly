@@ -24,7 +24,7 @@
           <simple>${header.methodName} == 'purgeObject'</simple>
           <!-- fire a Solr delete operation at the index, in case it was an indexable object -->
           <to uri="freemarker:freemarker/solr/delete.vm"/>
-          <inOut uri="nmr:endpoint:indexing:solr:update"/>
+          <to uri="nmr:endpoint:indexing:solr:update"/>
           <!-- but also assume that it might have been an indexer object -->
           <!-- first gather the affected objects -->
           <to uri="freemarker:freemarker/sparql/getindexedobjects.vm"/>
