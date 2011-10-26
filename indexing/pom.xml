@@ -158,7 +158,7 @@
     
     <modules>
         <module>indexing-camel-router</module>
-        <module>solr-http-provider</module>
+      <!--  <module>solr-http-provider</module> -->
         <module>single-datastream-xslt</module>
        <!-- <module>getIndexMetadata-http-consumer</module> -->
     <module>splitRDFDescriptions-xslt</module>

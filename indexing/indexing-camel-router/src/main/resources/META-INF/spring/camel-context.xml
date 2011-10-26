@@ -105,7 +105,7 @@
       <to uri="http://fedora/getIndexingMetadata"/>
       <removeHeader headerName="CamelHttpUri"/>
       <removeHeader headerName="CamelHttpMethod"/>
-      <to uri="jbi:endpoint:urn:lib:indexing:solr:update"/>
+      <to uri="http://mbusdev.lib.virginia.edu:8080/solr/update"/>
     </route>
     
     <route>
