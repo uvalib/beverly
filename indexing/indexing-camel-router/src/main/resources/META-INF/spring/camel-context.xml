@@ -110,7 +110,7 @@
     
     <route>
       <description>Construct or retrieve indexing metadata for a single object</description>
-      <from uri="jetty:http://0.0.0.0:8192/getIndexingMetadata"/>
+      <from uri="jetty:http://0.0.0.0:8193/getIndexingMetadata"/>
       <to uri="freemarker:freemarker/atom/listdatastreams.vm"/>
       <inOut uri="nmr:service:repositories:api-a"/>
       <choice>
