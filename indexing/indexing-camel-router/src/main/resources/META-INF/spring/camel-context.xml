@@ -133,11 +133,14 @@
           <!-- swap info:fedora/ stuff for dereferencable URLs -->
           <inOut uri="jbi:service:urn:lib:indexing:concretizeURIs"/>
           <inOut uri="jbi:service:urn:lib:indexing:splitRDFDescriptions"/>
-          <to uri="log:postsplitdescriptions"/>
+          <log message="Post-Split RDF descriptions: in.body = ${in.body} and out.body = ${out.body}"/>
+      
           <split parallelProcessing="true" strategyRef="simpleXMLRecursiveMergeStrategy">
             <xpath>/rdf:RDF/rdf:Description</xpath>
             <!-- transform a single metadata stream against its XSLT -->
             <!-- stick stylesheet URL in a header -->
+            <log message="One of the split RDF descriptions: in.body = ${in.body} and out.body = ${out.body}"/>
+            
             <setHeader headerName="stylesheetURL">
               <xpath resultType="java.lang.String">/rdf:Description/uva-lib:isIndexedBy/@rdf:resource</xpath>
             </setHeader>
