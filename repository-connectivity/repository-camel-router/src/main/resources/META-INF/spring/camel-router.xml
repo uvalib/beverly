@@ -38,7 +38,7 @@
             
             <!-- default repo API-A url -->
             <to
-                uri="http:fedora/services/access?authMethod=Basic&amp;authUsername=fedoraAdmin&amp;authPassword=fedoraAdmin"/>
+                uri="http:fedora/services/access?authMethod=Basic&amp;authUsername=fedoraAdmin&amp;authPassword=fedoraAdmin&amp;httpClient.soTimeout=6000"/>
             <removeHeader headerName="SOAPAction"/>
             <removeHeader headerName="CamelHttpUri"/>
         </route>
@@ -52,7 +52,7 @@
             </setHeader>
             <!-- override with repositoryURL -->
             <setHeader headerName="CamelHttpUri">
-                <simple>${headers.repositoryURL}/services/management?httpClient.authenticationPreemptive=true&amp;username=fedoraAdmin&amp;password=fedoraAdmin</simple>
+                <simple>${headers.repositoryURL}/services/management?httpClient.authenticationPreemptive=true&amp;username=fedoraAdmin&amp;password=fedoraAdmin&amp;httpClient.soTimeout=6000</simple>
             </setHeader>
             <!-- default repo API-A url -->
             <to uri="http:fedora/services/management"/>
@@ -73,7 +73,7 @@
             </setHeader>
             <!-- override endpoint address with repositoryURL -->
             <setHeader headerName="CamelHttpUri">
-                <simple>${headers.repositoryURL}/risearch</simple>
+                <simple>${headers.repositoryURL}/risearch&amp;httpClient.soTimeout=6000</simple>
             </setHeader>
             <!-- default repo RI search url -->
             <to uri="http:fedora/risearch"/>
