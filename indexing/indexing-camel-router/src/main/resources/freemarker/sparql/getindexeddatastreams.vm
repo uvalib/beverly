@@ -5,5 +5,5 @@ PREFIX uva-lib: <http://fedora.lib.virginia.edu/relationships#>
 CONSTRUCT { ?datastream <uva-lib:isDependentOn> <info:fedora/${headers.pid}> . }
 WHERE
 {
- ?datastream <uva-lib:isIndexedBy> <info:fedora/${headers.pid}/datastreams/XSLT> 
+ ?datastream <uva-lib:isIndexedBy> <info:fedora/${headers.pid}/XSLT> 
 }  
