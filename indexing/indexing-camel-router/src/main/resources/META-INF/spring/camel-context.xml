@@ -110,7 +110,7 @@
     
     <route>
       <description>Construct or retrieve indexing metadata for a single object</description>
-      <from uri="jetty:http://0.0.0.0:8193/getIndexingMetadata"/>
+      <from uri="jetty:http://0.0.0.0:8193/getIndexingMetadata?continuationTimeout=-1"/>
       <removeHeader headerName="CamelHttpUri"/>
       <removeHeader headerName="CamelHttpPath"/>
       <to uri="freemarker:freemarker/atom/listdatastreams.vm"/>
