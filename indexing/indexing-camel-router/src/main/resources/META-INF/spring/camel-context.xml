@@ -117,9 +117,10 @@
       <from uri="jetty:http://0.0.0.0:8193/getIndexingMetadata?continuationTimeout=-1"/>
       <removeHeader headerName="CamelHttpUri"/>
       <removeHeader headerName="CamelHttpPath"/>
+      <!--
       <to uri="freemarker:freemarker/atom/listdatastreams.vm"/>
       <inOut uri="nmr:service:repositories:api-a"/>
-    <!--
+    
       <choice>
         <when>
           <xpath>//datastreamDef/ID = 'SOLR'</xpath>
