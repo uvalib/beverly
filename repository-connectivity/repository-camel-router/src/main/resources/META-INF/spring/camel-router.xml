@@ -100,7 +100,7 @@
     
     <bean id="myHttpConnectionManagerParams" class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">
         <property name="defaultMaxConnectionsPerHost" value="15"/>
-        <property name="maxConnectionsPerHost" value="15"/>
+        <property name="maxTotalConnections" value="15"/>
     </bean>
 
 </beans>
