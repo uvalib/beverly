@@ -19,7 +19,7 @@
       poolSize="20" maxPoolSize="40" maxQueueSize="1000"
       rejectedPolicy="CallerRuns"/>
     
-    <threadPool id="threadpool" />
+    <threadPool id="threadpool" poolSize="20" threadName="threadpool-thread-" />
 
     <route>
       <description>Entry point for all indexing workflows</description>
