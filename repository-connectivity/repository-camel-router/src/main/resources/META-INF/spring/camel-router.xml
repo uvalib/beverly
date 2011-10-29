@@ -59,7 +59,7 @@
                 <simple>${headers.repositoryURL}/services/management?httpClient.authenticationPreemptive=true&amp;username=fedoraAdmin&amp;password=fedoraAdmin</simple>
             </setHeader>
             <!-- default repo API-A url -->
-            <to uri="http:fedora/services/management&amp;httpClient.soTimeout=6000"/>
+            <to uri="http:fedora/services/management?httpClient.soTimeout=6000"/>
             <removeHeader headerName="SOAPAction"/>
             <removeHeader headerName="CamelHttpUri"/>
         </route>
@@ -80,7 +80,7 @@
                 <simple>${headers.repositoryURL}/risearch</simple>
             </setHeader>
             <!-- default repo RI search url -->
-            <to uri="http:fedora/risearch&amp;httpClient.soTimeout=6000"/>
+            <to uri="http:fedora/risearch?httpClient.soTimeout=6000"/>
             <removeHeader headerName="Content-Type"/>
             <removeHeader headerName="CamelHttpChunked"/>
             <removeHeader headerName="CamelHttpUri"/>
