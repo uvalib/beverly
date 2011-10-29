@@ -182,4 +182,19 @@
 
   <bean id="simpleXMLRecursiveMergeStrategy" class="edu.virginia.lib.ole.esb.aggregation.SimpleXMLRecursiveMergeStrategy"/>
 
+  <bean id="http" class="org.apache.camel.component.http.HttpComponent">
+    <property name="camelContext" ref="indexer"/>
+    <property name="httpConnectionManager" ref="myHttpConnectionManager"/>
+  </bean>
+  
+  <bean id="myHttpConnectionManager" class="org.apache.commons.httpclient.MultiThreadedHttpConnectionManager">
+    <property name="params" ref="myHttpConnectionManagerParams"/>
+  </bean>
+  
+  <bean id="myHttpConnectionManagerParams" class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">
+    <property name="defaultMaxConnectionsPerHost" value="15"/>
+    <property name="maxTotalConnections" value="15"/>
+  </bean>
+  
+
 </beans>
