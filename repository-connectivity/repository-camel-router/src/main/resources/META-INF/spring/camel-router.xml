@@ -90,7 +90,7 @@
     </camelContext>
     
     <bean id="http" class="org.apache.camel.component.http.HttpComponent">
-        <property name="camelContext" ref="camel"/>
+        <property name="camelContext" ref="repoconnector"/>
         <property name="httpConnectionManager" ref="myHttpConnectionManager"/>
     </bean>
     
