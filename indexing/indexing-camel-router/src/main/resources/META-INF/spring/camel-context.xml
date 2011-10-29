@@ -84,7 +84,7 @@
               <!-- Ordinary form to index on an indexer object -->
               <to uri="freemarker:freemarker/sparql/getindexeddatastreams.vm"/>
               <inOut uri="nmr:service:repositories:resource-index"/>
-              <split executorServiceRef="#threadpool" parallelProcessing="true">
+              <split executorServiceRef="threadpool" parallelProcessing="true">
                 <xpath>/rdf:RDF/rdf:Description</xpath>
                 <setHeader headerName="pid">
                   <!-- peel out the pid itself -->
@@ -142,7 +142,7 @@
           <inOut uri="jbi:service:urn:lib:indexing:splitRDFDescriptions"/>
           <log message="Post-Split RDF descriptions: in.body = ${in.body} and out.body = ${out.body}"/>
       
-      <split executorServiceRef="#threadpool" parallelProcessing="true" strategyRef="simpleXMLRecursiveMergeStrategy">
+      <split executorServiceRef="threadpool" parallelProcessing="true" strategyRef="simpleXMLRecursiveMergeStrategy">
             <xpath>/rdf:RDF/rdf:Description</xpath>
             <!-- transform a single metadata stream against its XSLT -->
             <!-- stick stylesheet URL in a header -->
