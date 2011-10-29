@@ -8,7 +8,7 @@
        xsi:schemaLocation="http://servicemix.apache.org/saxon/1.0 http://repo.open.iona.com/maven2/org/apache/servicemix/servicemix-saxon/2011.01.0-fuse-00-00/servicemix-saxon-2011.01.0-fuse-00-00.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-  <saxon:xslt service="indexing:single-datastream-xslt" endpoint="transform"  copyProperties="true">
+  <saxon:xslt service="indexing:single-datastream-xslt" endpoint="transform" copyProperties="true">
     
     <property name="expression">
       <bean class="org.apache.servicemix.expression.PropertyExpression">

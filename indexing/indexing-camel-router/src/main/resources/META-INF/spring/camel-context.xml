@@ -82,7 +82,7 @@
               <!-- Ordinary form to index on an indexer object -->
               <to uri="freemarker:freemarker/sparql/getindexeddatastreams.vm"/>
               <inOut uri="nmr:service:repositories:resource-index"/>
-              <split stopOnException="true" executorServiceRef="defaultThreadPoolProfile" parallelProcessing="true">
+              <split stopOnException="true" executorServiceRef="defaultThreadPoolProfile" parallelProcessing="false">
                 <xpath>/rdf:RDF/rdf:Description</xpath>
                 <setHeader headerName="pid">
                   <!-- peel out the pid itself -->
