@@ -10,6 +10,10 @@
     
     <camelContext id="repoconnector" xmlns="http://camel.apache.org/schema/spring"
        xmlns:atom="http://www.w3.org/2005/Atom">
+        
+        <threadPoolProfile id="defaultThreadPoolProfile" defaultProfile="true"
+            poolSize="20" maxPoolSize="40" maxQueueSize="1000"
+            rejectedPolicy="CallerRuns"/>
 
         <route>
             <from uri="jbi:service:urn:lib:repositories:messaging"/>

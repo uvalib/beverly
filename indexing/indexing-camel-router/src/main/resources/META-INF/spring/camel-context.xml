@@ -14,6 +14,10 @@
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:fedora-model="info:fedora/fedora-system:def/model#"
     xmlns:uva-lib="http://fedora.lib.virginia.edu/relationships#">   
+    
+    <threadPoolProfile id="defaultThreadPoolProfile" defaultProfile="true"
+      poolSize="20" maxPoolSize="40" maxQueueSize="1000"
+      rejectedPolicy="CallerRuns"/>
 
     <route>
       <description>Entry point for all indexing workflows</description>
