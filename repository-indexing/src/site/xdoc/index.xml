@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Beverly</title>
+        <author email="ajs6f@virginia.edu">A. Soroka</author>
+    </properties>
+    
+    <body>
+        <section name="">
+            <p>Beverly is an attempt to explore some new (and some not-so-new) principles in the field of indexing digital object repositories.
+                It's a work-in-progress and should currently be considered experimental. Please read about <a href="motivations.html">the motivations</a>
+            behind Beverly, take a look at some <a href="publications.html">conference presentations and posters</a>, <a href="install.html">and try it out</a>!</p>
+            <p>Please <a href="mailto:ajs6f@virginia.edu">contact</a> us with any questions or thoughts.</p>
+        </section>
+    </body>
+</document>

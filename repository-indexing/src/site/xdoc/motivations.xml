@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Motivations</title>
+        <author email="ajs6f@virginia.edu">A. Soroka</author>
+    </properties>
+    
+    <body>
+        <section name="Background">
+            <p>The University of Virginia Library, like many institutions, faced pair of interrelated problems. Firstly, the indexing of content
+            in our digital object repositories was accomplished by piecework scripts written by technicians whose expertise does not extend to
+            curating the materials in our collections. Secondly, our presentation of those materials was and is increasingly dependent on index
+            records.</p>
+        </section>
+    </body>
+    
+</document>

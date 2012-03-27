@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+  xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+  http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0 http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0
+  http://camel.apache.org/schema/blueprint https://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+
+  <!-- OSGI blueprint property placeholder -->
+  <cm:property-placeholder id="blueprint.placeholder"
+    persistent-id="edu.virginia.lib.repository-indexing">
+    <cm:default-properties>
+      <cm:property name="indexable-cm" value="indexable:cm"/>
+      <cm:property name="indexable-sdef" value="indexable:sdef"/>
+      <cm:property name="solr-update-url" value="http://localhost:8080/solr/update"/>
+      <cm:property name="getIndexingMetadata-port" value="8193"/>
+      <cm:property name="indexer-cm" value="indexer:cm"/>
+      <cm:property name="solr-datastream" value="SOLR"/>
+      <cm:property name="fedora-api-m-queue-name" value="fedora.apim.update"/>
+      <cm:property name="fedoraPassword" value="fedoraAdmin"/>
+      <cm:property name="fedoraUsername" value="fedoraAdmin"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <camelContext id="repository-indexer" xmlns="http://camel.apache.org/schema/blueprint" streamCache="true">
+
+    <propertyPlaceholder id="properties" location="blueprint:blueprint.placeholder"/>
+
+    <jmxAgent id="agent" disabled="true"/>
+
+    <threadPoolProfile id="defaultThreadPoolProfile" defaultProfile="true" poolSize="8"
+      maxPoolSize="12" maxQueueSize="10000" rejectedPolicy="CallerRuns"/>
+
+    <route>
+      <description>Entry point for all indexing workflows</description>
+      <from uri="seda:service:indexing:index"/>
+
+      <!-- add choice of content models to headers for retrieval in xquery expressions -->
+      <setHeader headerName="indexablecm">
+        <simple>${properties:indexable-cm}</simple>
+      </setHeader>
+      <setHeader headerName="indexercm">
+        <simple>${properties:indexer-cm}</simple>
+      </setHeader>
+
+      <choice>
+        <when>
+          <description>Is this a purgeObject operation?</description>
+          <simple>${header.methodName} == 'purgeObject'</simple>
+          <!-- fire a Solr delete operation at the index, in case it was an indexable object -->
+          <to uri="freemarker:freemarker/solr/delete.vm"/>
+          <to uri="{{solr-update-url}}"/>
+          <!-- but also assume that it might have been an indexer object -->
+          <!-- first gather the affected objects -->
+          <to uri="freemarker:freemarker/sparql/getindexedobjects.vm"/>
+          <inOut uri="seda:service:repositories:resource-index"/>
+          <!-- remove the appropriate no-longer-relevant RELS-INT triples -->
+          <split parallelProcessing="true">
+            <xquery>
+              declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+              /rdf:RDF/rdf:Description
+            </xquery>
+            <removeHeader headerName="methodName"/>
+            <!-- remove the appropriate no-longer-relevant RELS-INT triple -->
+            <setHeader headerName="subject">
+              <!-- peel out the indexable subject -->
+              <xquery type="java.lang.String">
+                declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+                /rdf:Description/@rdf:about
+              </xquery>
+            </setHeader>
+            <to uri="freemarker:freemarker/atom/removetriples.vm"/>
+            <removeHeader headerName="subject"/>
+            <to uri="seda:service:repositories:api-m"/>
+            <!-- don't need to explicitly reindex the object because we just
+              called purgeRelationship on it, which will trigger reindexing-->
+          </split>
+        </when>
+        <otherwise>
+          <description>This object was not purged, so we can retrieve info about it from its
+          repo</description>
+
+          <!-- is this a content object or an indexer object? -->
+
+          <to uri="freemarker:freemarker/sparql/getcontentmodels.vm"/>
+          <inOut uri="seda:service:repositories:resource-index"/>
+          <log
+            message="Retrieved content model information: in.body = ${in.body} and out.body = ${out.body}"/>
+          <log
+            message="Checking for indexable content model: ${in.headers.indexablecm} or indexer content model: ${in.headers.indexercm}"/>
+          <choice>
+            <when>
+              <description>Does this object have the indexable CM?</description>
+              <xquery>
+                declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+                declare namespace fedora-model="info:fedora/fedora-system:def/model#";
+                declare variable $in.headers.indexablecm as xs:string external;
+                /rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',$in.headers.indexablecm)
+              </xquery>
+              <choice>
+                <when>
+                  <description>Is this a purgeDatastream operation?</description>
+                  <simple>${header.methodName} == 'purgeDatastream'</simple>
+                  <!-- first remove any dependent RELS-INT triples -->
+                  <to uri="freemarker:freemarker/sparql/getindexedpurgeddatastreams.vm"/>
+                  <!-- now reindex this object -->
+                  <to uri="direct:service:indexing:indexIndexableObject"/>
+                </when>
+                <otherwise>
+                  <to uri="direct:service:indexing:indexIndexableObject"/>
+                </otherwise>
+              </choice>
+            </when>
+            <when>
+              <description>Does this object have the indexer CM?</description>
+              <xquery>
+                declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+                declare namespace fedora-model="info:fedora/fedora-system:def/model#";
+                declare variable $in.headers.indexercm as xs:string external;
+                /rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',$in.headers.indexercm)
+              </xquery>
+              <log loggingLevel="DEBUG" message="Using indexer cm: {{indexer-cm}}"/>
+              <!-- Ordinary form to index on an indexer object -->
+              <!-- start by getting the indexed (dependent) datastreams -->
+              <to uri="freemarker:freemarker/sparql/getindexeddatastreams.vm"/>
+              <inOut uri="seda:service:repositories:resource-index"/>
+              <split stopOnException="true" parallelProcessing="true">
+                <xquery>
+                  declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+                  /rdf:RDF/rdf:Description
+                </xquery>
+                <setHeader headerName="pid">
+                  <!-- peel out the pid itself -->
+                  <xquery type="java.lang.String">
+                    declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+                    substring-before(substring-after(/rdf:Description/@rdf:about,'/'),'/')
+                  </xquery>
+                </setHeader>
+                <removeHeader headerName="methodName"/>
+                <to uri="seda:service:indexing:index"/>
+              </split>
+            </when>
+          </choice>
+        </otherwise>
+      </choice>
+    </route>
+
+    <route>
+      <description>Index a single object</description>
+      <from uri="direct:service:indexing:indexIndexableObject"/>
+      <setHeader headerName="CamelHttpUri">
+        <simple>${headers.repositoryURL}/objects/${headers.pid}/methods/{{indexable-sdef}}/getIndexingMetadata</simple>
+      </setHeader>
+      <setHeader headerName="CamelHttpMethod">
+        <constant>GET</constant>
+      </setHeader>
+      <to uri="http://fedora/getIndexingMetadata"/>
+      <removeHeader headerName="CamelHttpUri"/>
+      <removeHeader headerName="CamelHttpMethod"/>
+      <to uri="{{solr-update-url}}"/>
+    </route>
+
+    <route>
+      <description>Construct or retrieve indexing metadata for a single object</description>
+      <from
+        uri="jetty:http://0.0.0.0:{{getIndexingMetadata-port}}/getIndexingMetadata?continuationTimeout=-1"/>
+      <removeHeader headerName="CamelHttpUri"/>
+      <removeHeader headerName="CamelHttpPath"/>
+
+      <to uri="freemarker:freemarker/atom/listdatastreams.vm"/>
+      <inOut uri="seda:service:repositories:api-a"/>
+
+      <choice>
+        <when>
+          <xpath>//datastreamDef/ID = '{{solr-datastream}}'</xpath>
+          <setHeader headerName="libDatastream">
+            <constant>{{solr-datastream}}</constant>
+          </setHeader>
+          <to uri="freemarker:freemarker/atom/getdatastream.vm"/>
+          <inOut uri="seda:service:repositories:api-a"/>
+        </when>
+        <otherwise>
+          <description>Create indexing metadata from datastreams</description>
+
+          <to uri="freemarker:freemarker/sparql/getindexabledatastreams.vm"/>
+          <inOut uri="seda:service:repositories:resource-index"/>
+          <inOut uri="xslt:xslt/concretizeURIs.xsl?transformerFactory=tFactory"/>
+          <inOut uri="xslt:xslt/splitRDFDescriptions.xsl?transformerFactory=tFactory"/>
+          <log
+            message="Post-Split RDF descriptions: in.body = ${in.body} and out.body = ${out.body}"/>
+
+          <split stopOnException="true" parallelProcessing="false"
+            strategyRef="simpleXMLRecursiveMergeStrategy">
+            <xpath>/RDF/Description</xpath>
+            <!-- transform a single metadata stream against its XSLT -->
+            <log
+              message="One of the split RDF descriptions: in.body = ${in.body} and out.body = ${out.body}"/>
+            <!-- stick stylesheet URL in a header -->
+            <setHeader headerName="stylesheetURL">
+              <xpath resultType="java.lang.String">/Description/isIndexedBy/@resource</xpath>
+            </setHeader>
+            <!-- replace body with XML datastream -->
+            <setHeader headerName="CamelHttpUri">
+              <xpath resultType="java.lang.String">/Description/@about</xpath>
+            </setHeader>
+            <setHeader headerName="CamelHttpMethod">
+              <constant>GET</constant>
+            </setHeader>
+            <!-- this url is a dummy: the real URL is in CamelHttpUrl header
+              see: http://camel.apache.org/http.html -->
+            <to uri="http://www.example.com"/>
+            <removeHeader headerName="CamelHttpUri"/>
+            <removeHeader headerName="CamelHttpMethod"/>
+            <!-- use this header to select the transform dynamically
+                atomtosoap.xsl below is just a dummy -->
+            <setHeader headerName="CamelXsltResourceUri">
+              <simple>${header.stylesheetURL}</simple>
+            </setHeader>
+            <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"/>
+            <removeHeader headerName="CamelXsltResourceUri"/>
+          </split>
+          <inOut uri="xslt:xslt/mergeAndDeduplicateSolr.xsl?transformerFactory=tFactory"/>
+        </otherwise>
+      </choice>
+    </route>
+    
+    <route>
+      <from uri="jms:queue:{{fedora-api-m-queue-name}}"/>
+      <setHeader headerName="repositoryURL">
+        <xquery type="java.lang.String">
+          declare namespace atom="http://www.w3.org/2005/Atom";
+          /atom:entry/atom:author/atom:uri
+        </xquery>
+      </setHeader>
+      <to uri="seda:service:indexing:index"/>
+    </route>
+    
+    <route>
+      <from uri="seda:service:repositories:api-a"/>
+      <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"></inOut>
+      <setHeader headerName="CamelHttpMethod">
+        <constant>POST</constant>
+      </setHeader>
+      <!-- override with repositoryURL -->
+      <setHeader headerName="CamelHttpUri">
+        <simple>${headers.repositoryURL}/services/access</simple>
+      </setHeader>
+      <!-- Fedora, for some odd reason, requires a set SOAPAction header without using it -->
+      <setHeader headerName="SOAPAction">
+        <constant>dummy</constant>
+      </setHeader>
+      <log message="Sending SOAP message to repository: in.body = ${in.body} and out.body = ${out.body}"/>
+      
+      <!-- default repo API-A url -->
+      <to
+        uri="http:fedora/services/access?authMethod=Basic&amp;authUsername={{fedoraUsername}}&amp;authPassword={{fedoraPassword}}&amp;httpClient.soTimeout=6000"/>
+      <removeHeader headerName="SOAPAction"/>
+      <removeHeader headerName="CamelHttpUri"/>
+    </route>
+    
+    <route>
+      <from uri="seda:service:repositories:api-m"/>
+      <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"></inOut>
+      <setHeader headerName="CamelHttpMethod">
+        <constant>POST</constant>
+      </setHeader>
+      <!-- Fedora, for some odd reason, requires a set SOAPAction header without using it -->
+      <setHeader headerName="SOAPAction">
+        <constant>dummy</constant>
+      </setHeader>
+      <!-- override with repositoryURL -->
+      <setHeader headerName="CamelHttpUri">
+        <simple>${headers.repositoryURL}/services/management?httpClient.authenticationPreemptive=true&amp;username={{fedoraUsername}}&amp;password={{fedoraPassword}}</simple>
+      </setHeader>
+      <!-- dummy repo API-A url -->
+      <to uri="http:fedora/services/management?httpClient.soTimeout=6000"/>
+      <removeHeader headerName="SOAPAction"/>
+      <removeHeader headerName="CamelHttpUri"/>
+    </route>
+    
+    <route>
+      <from uri="seda:service:repositories:resource-index"/>
+      <setHeader headerName="Content-Type">
+        <constant>application/x-www-form-urlencoded</constant>
+      </setHeader>
+      <setHeader headerName="CamelHttpChunked">
+        <constant>false</constant>
+      </setHeader>
+      <setHeader headerName="CamelHttpMethod">
+        <constant>POST</constant>
+      </setHeader>
+      <!-- override endpoint address with repositoryURL -->
+      <setHeader headerName="CamelHttpUri">
+        <simple>${headers.repositoryURL}/risearch</simple>
+      </setHeader>
+      <!-- dummy repo RI search url -->
+      <to uri="http:fedora/risearch?httpClient.soTimeout=6000"/>
+      <removeHeader headerName="Content-Type"/>
+      <removeHeader headerName="CamelHttpChunked"/>
+      <removeHeader headerName="CamelHttpUri"/>
+      <removeHeader headerName="CamelHttpMethod"/>
+    </route>
+
+  </camelContext>
+
+  <bean id="simpleXMLRecursiveMergeStrategy"
+    class="edu.virginia.lib.ole.esb.aggregation.SimpleXMLRecursiveMergeStrategy"/>
+
+  <bean id="tFactory" class="net.sf.saxon.TransformerFactoryImpl"/>
+  
+  <!-- use CF from ActiveMQ blueprint service running in container -->
+  <reference id="connectionFactory" interface="javax.jms.ConnectionFactory" />
+  <bean id="jms" class="org.apache.camel.component.jms.JmsComponent">
+    <property name="connectionFactory" ref="connectionFactory" />
+  </bean>
+
+  <!--
+  <bean id="http" class="org.apache.camel.component.http.HttpComponent">
+    <property name="camelContext" ref="repository-indexer"/>
+    <property name="httpConnectionManager" ref="myHttpConnectionManager"/>
+  </bean>
+
+  <bean id="myHttpConnectionManager"
+    class="org.apache.commons.httpclient.MultiThreadedHttpConnectionManager">
+    <property name="params" ref="myHttpConnectionManagerParams"/>
+  </bean>
+
+  <bean id="myHttpConnectionManagerParams"
+    class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">
+    <property name="defaultMaxConnectionsPerHost" value="15"/>
+    <property name="maxTotalConnections" value="15"/>
+  </bean>
+  -->
+</blueprint>

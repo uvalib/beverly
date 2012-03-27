@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Requirements</title>
+        <author email="ajs6f@virginia.edu">A. Soroka</author>
+    </properties>
+    
+    <body>
+        <section name="What you (presumably) have">
+            <p>Beverly works between one or more Fedora repositories and an Apache Solr index.</p>
+        </section>
+        <section name="What you will have to supply">
+            <p>Currently, the only way to use Beverly is by housing in in <a href="https://karaf.apache.org/">Apache Karaf</a>, 
+                a powerful and full-featured OSGi container.
+            Installing and running Karaf is outside the scope of this document, but excellent instructions
+            are available <a href="https://karaf.apache.org/manual/latest-2.2.x/quick-start.html">here</a> and the
+            community is friendly!</p>
+            <p>Because Karaf allows of reusing the transitive dependency management power of Maven, but the Maven repository into
+            which Beverly is developed is not public, you mjst have a running Maven repository available to you into which you can install
+            the Beverly code. From there it will be deployed to your Karaf instance.</p>
+        </section>
+    </body>
+    
+</document>

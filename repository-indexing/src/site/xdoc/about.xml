@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Introduction</title>
+        <author email="ajs6f@virginia.edu">A. Soroka</author>
+    </properties>
+    
+    <body>
+        <section name="General">
+            <p>Beverly is an indexing system for <a href="http://fedora-commons.org/">Fedora</a> digital object repositories and <a href="https://lucene.apache.org/solr/">Apache Solr</a> indexes.</p>
+        </section>
+        <section name="Features">
+            <p>Beverly can index multiple repositories,
+                and can use (in the extreme case) a separate indexing configuration for each and every object therein.
+                It has highly-parallelized internal workflows and takes advantage of message queuing to offer good
+                scaling characteristics. The index record object </p>
+          
+        </section>
+        <section name="Properties">
+            <p>      Beverly relies on Fedora's ability to <a href="https://wiki.duraspace.org/display/FEDORA35/Messaging">publish events</a>
+                about changes to repository contents.
+                The configuration for indexing workflows is held in the repositories right next to the objects being indexed.</p>
+               
+        </section>
+    </body>
+
+</document>
