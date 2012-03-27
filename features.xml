@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0"
+    name="repository-indexing">
+    
+    <repository>http://repo1.maven.org/maven2/org/apache/camel/karaf/apache-camel/2.9.1/apache-camel-2.9.1-features.xml</repository>
+    
+    <feature name="repository-indexing" version="1.0-SNAPSHOT">
+        <bundle>mvn:edu.virginia.lib/repository-indexing</bundle>
+        <!-- depends on: -->
+        <!-- <bundle>mvn:org.apache.ws.commons.schema/XmlSchema/1.4.7</bundle> -->
+        <feature version="2.9.1">camel-saxon</feature>
+        <feature version="2.9.1">camel-blueprint</feature>
+        <feature version="2.9.1">camel-http</feature>
+        <feature version="2.9.1">camel-jms</feature>
+        <feature version="2.9.1">camel-jetty</feature>
+        <feature version="2.9.1">camel-freemarker</feature>
+    </feature>
+</features>
