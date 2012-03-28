@@ -16,7 +16,7 @@
 			<id>ajs6f</id>
 			<name>A. Soroka</name>
 			<email>ajs6f@virginia.edu</email>
-			<organization>the University of Virginia Library :: OLE</organization>
+			<organization>the University of Virginia Library :: OLE :: SSE</organization>
 			<organizationUrl>http://www.lib.virginia.edu</organizationUrl>
 			<timezone>EST</timezone>
 			<roles>
@@ -26,18 +26,13 @@
 	</developers>
 	<organization>
 		<name>the University of Virginia Library :: OLE :: SSE</name>
+		<url>http://www.virginia.edu</url>
 	</organization>
-
-
-	<distributionManagement>
-		<site>
-			<id>Beverly</id>
-			<url>https://github.com/uvalib/beverly</url>
-		</site>
-	</distributionManagement>
 
 	<scm>
 		<url>https://github.com/uvalib/beverly</url>
+		<connection>git://github.com/uvalib/beverly.git</connection>
+		<developerConnection>git://github.com/uvalib/beverly.git</developerConnection>
 	</scm>
 
 	<properties>

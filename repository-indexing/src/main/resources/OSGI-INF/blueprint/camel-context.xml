@@ -9,7 +9,7 @@
 
   <!-- OSGI blueprint property placeholder -->
   <cm:property-placeholder id="blueprint.placeholder"
-    persistent-id="edu.virginia.lib.repository-indexing">
+    persistent-id="edu.virginia.lib.beverly">
     <cm:default-properties>
       <cm:property name="indexable-cm" value="indexable:cm"/>
       <cm:property name="indexable-sdef" value="indexable:sdef"/>

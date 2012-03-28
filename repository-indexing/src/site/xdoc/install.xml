@@ -17,9 +17,8 @@
                 <li>Connect your Fedora repository to your Karaf-housed message broker.</li>
                 <li>Get <a href="https://github.com/uvalib/beverly">Beverly</a>.</li>
                 <li>Install Beverly to your local Maven repository.</li>
-                <li>Ensure that your Karaf instance can draw upon your local Maven repository.</li>
-                <li>Load the feature repositories into Karaf.</li>
-                <li>Install the Beverly features.</li>
+                <li><a href="http://www.andrejkoelewijn.com/wp/2010/06/21/adding-a-maven-repository-for-installing-features-to-servicemix/">Ensure that your Karaf instance can draw upon your local Maven repository.</a></li>
+                <li><a href="install/install-features.html">Load the feature descriptor into Karaf and install the Beverly features.</a></li>
                 <li>Configure Beverly to send index records to your Apache Solr index.</li>
                 <li>Load some objects into your Fedora repository to take advantage of Beverly's indexing.</li>
                 <li>Explore!</li>

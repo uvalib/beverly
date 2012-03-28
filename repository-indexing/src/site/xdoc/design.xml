@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Beverly's design</title>
+        <author email="ajs6f@virginia.edu">A. Soroka</author>
+    </properties>
+    
+    <body>
+        <section name="Beverly's design">
+            <p>Beverly is predicated on the following Fedora object model:
+            </p> 
+            <p>
+                <img src="images/beverly-object-model.png" alt="Beverly object model diagram"/>
+            </p>
+            <p>
+                The intention is to declaratively configure the indexing workflow via <a href="https://wiki.duraspace.org/display/FEDORA35/Digital+Object+Relationships">Fedora's RDF graph</a>.
+                Each object that is indexable is made known to be so by attaching to it an "indexable"
+                Fedora content model. The name of that content model is configurable, but in this diagram it is shown as
+                "indexer:cm". Shown as a shadow behind "indexer:cm" is "indexer:sdef", which entails the one 
+                dynamic dissemination that this content model provides: "getIndexMetadata". In the RELS-INT datastream 
+                of an indexable object (shown here as "content:someObject"), links are made between the datastreams that
+                should be used for index extraction and the transformations that will be used for extracting on those datastreams.
+                </p>
+            <p>The assumption is made that each transformation yields a complete and valid Solr XML record, all of which are
+                then merged and de-duplicated to become the final record for that object.
+            </p>
+               <p> Further, there are indexer objects (shown as "indexer:TEI" and "indexer:MODS") which supply those very transformations via
+                   a "getIndexingTransformation" dynamic dissemination.
+                For example, an RDF link between datastream content:someContent/MODS and the getIndexingTransformation dissemination
+                of indexer:MODS indicates that running the output of getIndexingTransformation (an XSLT transform) against content:someContent/MODS
+                will produce a valid Solr XML record (which presumably will contain index fields that can be drawnw from
+                descriptive metadata, such as MODS is).
+            </p>
+            <p>
+                It is entirely possible to use external URLs for the targets of these RELS-INT links. The advantage to curating
+                the indexing transformations inside the repository as shown here is that we are able to use the repository's notification
+                facility to take action when an indexing transformation has changed, automatically reindexing all affected objects. This eliminates a
+                huge amount of manual labor which typically takes the form of running many different scripts to redo indexing. It also presents the possibility
+                of "iterative" work correcting or improving an indexing transformation with the opportunity to see the results across many different objects 
+                very quickly.
+            </p>
+            <p>
+                Here is a high-level diagram of Beverly's workflow:
+            </p>
+            <p>
+                <img src="images/beverly-workflows.png" alt="Beverly workflow diagram"/>
+            </p>
+        </section>
+    </body>
+</document>

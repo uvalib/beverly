@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Install Beverly as a Karaf feature</title>
+        <author email="ajs6f@virginia.edu">A. Soroka</author>
+    </properties>
+    
+    <body>
+        <section name="Install Beverly as a Karaf feature">
+            <p>
+                First make the Beverly feature descriptor (which comes in the source as <source>features.xml</source>)
+                available to Karaf, then install the feature. We will assume that your unpacked source is at <source>[BEVERLY_SOURCE]</source>. Then your Karaf
+                interaction would look like:
+                <source>
+                    karaf> features:addurl [BEVERLY_SOURCE]/features.xml
+                    karaf> features:install repository-indexing
+                </source>
+            </p>
+        </section>
+    </body>
+</document>
