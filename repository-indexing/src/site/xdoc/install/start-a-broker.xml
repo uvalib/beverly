@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Starting an ActiveMQ broker in Karaf</title>
+        <author email="ajs6f@virginia.edu">A. Soroka</author>
+    </properties>
+    
+    <body>
+        <section name="Starting an ActiveMQ broker in Karaf">
+            <p>Using the Karaf shell:
+                    <source>
+                        karaf> features:addurl  http://repo1.maven.org/maven2/org/apache/activemq/activemq-karaf/5.5.1/activemq-karaf-5.5.1-features.xml
+                        karaf> features:install activemq-broker
+                        karaf> activemq:create-broker -t blueprint
+                    </source>
+            </p>
+            <p>By default, JMS/Openwire (as is used by Fedora's <a href="https://wiki.duraspace.org/display/FEDORA35/Messaging">messaging service</a>)
+                traffic will be serviced by this new broker at port 61616.</p>
+        </section>
+    </body>
+</document>

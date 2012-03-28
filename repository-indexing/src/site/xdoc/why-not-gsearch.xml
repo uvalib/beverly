@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Why not use GSearch?</title>
+        <author email="ajs6f@virginia.edu">A. Soroka</author>
+    </properties>
+    
+    <body>
+        <section name="Why not use GSearch?">
+            <p>Because we wanted to try to do some things that <a href="https://wiki.duraspace.org/display/FCSVCS/Generic+Search+Service+2.4.1">GSearch</a> currently doesn't do.
+                In fact, GSearch (unlike Beverly) is a tried-and-true, well-tested, production-ready
+            solution for Fedora indexing, with a considerable community. If you need to get a solution in 
+            place quickly and stably, GSearch is the obvious choice. We decided to try something else because
+            we wanted to move indexing configuration into our repositories in a more powerful way than could be done
+            with the current model of GSearch configuration. In particular, we wanted to explore the use of RDF to express indexing
+            relationships. We also wanted to try a new model for the relationship between index records and Fedora objects, in which
+            index records are comprised of the results of separate indexing transformations for each datastream involved. We expect this to 
+            make extending indexing workflows simple and easy. Lastly, we wanted to move the indexing action itself out of the
+            Java and XSLT that composes GSearch workflow to a language more suitable for expressing workflow concepts. We chose Apache Camel's
+            message-driven workflow DSL for this purpose. 
+            </p>
+        </section>
+    </body>
+</document>

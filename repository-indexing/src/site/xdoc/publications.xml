@@ -8,7 +8,11 @@
     </properties>
     
     <body>
-        <section name="Posters"></section>
-        <section name="Presentations"></section>
+        <section name="Posters">
+            <p><a href="http://libra.virginia.edu/catalog/libra-oa:218">A Curator-Friendly Workflow System for Editing and Indexing XML Metadata in Digital Repositories </a></p>          
+        </section>
+        <section name="Presentations">
+            <p><a href="http://libra.virginia.edu/catalog/libra-oa:526">The Use Of Message-Driven Workflows On The Service Bus Pattern for Indexing Fedora Repositories</a></p>
+        </section>
     </body>
 </document>

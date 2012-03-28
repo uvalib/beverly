@@ -18,8 +18,8 @@
             are available <a href="https://karaf.apache.org/manual/latest-2.2.x/quick-start.html">here</a> and the
             community is friendly!</p>
             <p>Because Karaf allows of reusing the transitive dependency management power of Maven, but the Maven repository into
-            which Beverly is developed is not public, you mjst have a running Maven repository available to you into which you can install
-            the Beverly code. From there it will be deployed to your Karaf instance.</p>
+            which Beverly is developed is not public, you will want to have a running Maven repository available to you into which you can install
+            the Beverly code, from which it will be deployed to your Karaf instance.</p>
         </section>
     </body>
     

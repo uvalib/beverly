@@ -9,10 +9,14 @@
     
     <body>
         <section name="Background">
-            <p>The University of Virginia Library, like many institutions, faced pair of interrelated problems. Firstly, the indexing of content
-            in our digital object repositories was accomplished by piecework scripts written by technicians whose expertise does not extend to
+            <p>The University of Virginia Library, like many institutions, faced a pair of interrelated problems. Firstly, the indexing of content
+            in our digital object repositories was accomplished by piecework batch-processing scripts written by technicians whose expertise does not extend to
             curating the materials in our collections. Secondly, our presentation of those materials was and is increasingly dependent on index
             records.</p>
+            <p>In order to attack both of these problems, we decided to construct an indexing system that maintains workflow configuration in the repositories
+            themselves (whcih will eventually allow for it to be altered via tools acting on the repositories) and does indexing in an event-driven manner that is triggered
+            by changed in the repository state. This allows for curatorial personel to make changes to the repository contents and have those changes
+            propagate into the indexes that support presentation <i>without</i> intervention from technicians.</p>
         </section>
     </body>
     

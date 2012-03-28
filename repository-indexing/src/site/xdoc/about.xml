@@ -12,16 +12,19 @@
             <p>Beverly is an indexing system for <a href="http://fedora-commons.org/">Fedora</a> digital object repositories and <a href="https://lucene.apache.org/solr/">Apache Solr</a> indexes.</p>
         </section>
         <section name="Features">
-            <p>Beverly can index multiple repositories,
-                and can use (in the extreme case) a separate indexing configuration for each and every object therein.
+            <p>Beverly can index multiple repositories, using distinct indexing confgurations for distinct collections or even
+                (in the extreme case) a separate indexing configuration for each and every object therein.
                 It has highly-parallelized internal workflows and takes advantage of message queuing to offer good
-                scaling characteristics. The index record object </p>
+                scaling characteristics. An index record can be composed of information from one or more datastreams,
+                or even datastreams multiple objects (for example, from a collection-level object and an item-level
+                object.)</p>
           
         </section>
         <section name="Properties">
             <p>      Beverly relies on Fedora's ability to <a href="https://wiki.duraspace.org/display/FEDORA35/Messaging">publish events</a>
                 about changes to repository contents.
-                The configuration for indexing workflows is held in the repositories right next to the objects being indexed.</p>
+                The configuration for indexing workflows is held in the repositories right next to the objects being indexed, in Fedora's internal RDF graph. Currently, Beverly is limited
+            to indexing XML metadata, but that will hopefully not be the case for much longer. Indexing transformations are written in XSLT. </p>
                
         </section>
     </body>
