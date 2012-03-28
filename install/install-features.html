@@ -97,10 +97,10 @@
     
         <div class="section"><h2>Install Beverly as a Karaf feature<a name="Install_Beverly_as_a_Karaf_feature"></a></h2>
             <p>
-                First make the Beverly feature descriptor (which comes in the source as </p><div class="source"><pre class="prettyprint">features.xml</pre></div>)
-                available to Karaf, then install the feature. We will assume that your unpacked source is at <div class="source"><pre class="prettyprint">[BEVERLY_SOURCE]</pre></div>. Then your Karaf
+                First make the Beverly feature descriptor (which comes in the source as <tt>features.xml</tt>)
+                available to Karaf, then install the feature. We will assume that your unpacked source is at <tt>[BEVERLY_SOURCE]</tt>. Then your Karaf
                 interaction would look like:
-                <div class="source"><pre class="prettyprint">
+                </p><div class="source"><pre class="prettyprint">
                     karaf&gt; features:addurl [BEVERLY_SOURCE]/features.xml
                     karaf&gt; features:install repository-indexing
                 </pre></div>

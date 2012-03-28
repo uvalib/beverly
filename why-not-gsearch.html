@@ -104,7 +104,8 @@
             with the current model of GSearch configuration. In particular, we wanted to explore the use of RDF to express indexing
             relationships. We also wanted to try a new model for the relationship between index records and Fedora objects, in which
             index records are comprised of the results of separate indexing transformations for each datastream involved. We expect this to 
-            make extending indexing workflows simple and easy. Lastly, we wanted to move the indexing action itself out of the
+            make extending indexing workflows simple and easy. We wanted to ensure that changes to indexing transforms propagate to the 
+            inde records they affect with a minimum of fuss. Lastly, we wanted to move the indexing action itself out of the
             Java and XSLT that composes GSearch workflow to a language more suitable for expressing workflow concepts. We chose Apache Camel's
             message-driven workflow DSL for this purpose. 
             </p>
