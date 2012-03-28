@@ -100,11 +100,11 @@
                 Beverly uses the <a class="externalLink" href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/cm/ConfigurationAdmin.html">OSGi ConfigAdmin service</a> for its (minimal) configuration.
                 Because we house Beverly in Karaf, we have available simple, easy-to-use machinery to manipulate configuration.
                 In fact, you need do nothing more than place a Java properties 
-                file named </p><div class="source"><pre class="prettyprint">edu.virginia.lib.beverly.cfg</pre></div> in the <div class="source"><pre class="prettyprint">etc</pre></div> folder of your
-                Karaf instance to override Beverly's default settings. You can also use the Karaf command line's <div class="source"><pre class="prettyprint">config:*</pre></div>
+                file named <tt>edu.virginia.lib.beverly.cfg</tt> in the <tt>etc</tt> folder of your
+                Karaf instance to override Beverly's default settings. You can also use the Karaf command line's <tt>config:*</tt>
                 commands to dynamically change individual settings, but please be aware that the container will watch
-                any file you put in <div class="source"><pre class="prettyprint">etc</pre></div> anyway, so changes made there will come online without further intervention.
-            
+                any file you put in <tt>etc</tt> anyway, so changes made there will come online without further intervention.
+            </p>
             <p>
                 Here is a list of the currently available settings:
             </p>
