@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Project Build Plugins</title>
+    <title>
+        Beverly's design</title>
     <link rel="stylesheet" href="./css/apache-maven-fluido.min.css" />
     <link rel="stylesheet" href="./css/site.css" />
     <link rel="stylesheet" href="./css/print.css" media="print" />
@@ -13,6 +14,7 @@
     <script type="text/javascript" src="./js/apache-maven-fluido.min.js"></script>
 
     
+      <meta name="author" content="A. Soroka" />
     <meta name="Date-Revision-yyyymmdd" content="20120328" />
     <meta http-equiv="Content-Language" content="en" />
     
@@ -64,8 +66,8 @@
                           <a href="require.html" title="Requirements">Requirements</a>
             </li>
                   <li class="none">
-                          <a href="design.html" title="Design">Design</a>
-            </li>
+            <strong>Design</strong>
+          </li>
                   <li class="none">
                           <a href="install.html" title="Installation">Installation</a>
             </li>
@@ -88,7 +90,50 @@
       <div id="bodyColumn" class="content">
         <div id="contentBox">
                               
-          <div class="section"><h2>Project Build Plugins<a name="Project_Build_Plugins"></a></h2><a name="Project_Build_Plugins"></a><table border="0" class="zebra-striped"><tr class="a"><th>GroupId</th><th>ArtifactId</th><th>Version</th></tr><tr class="b"><td>com.github.github</td><td><a class="externalLink" href="https://github.com/github/maven-plugins">site-maven-plugin</a></td><td>0.5</td></tr><tr class="a"><td>org.apache.felix</td><td><a class="externalLink" href="http://felix.apache.org/maven-bundle-plugin/">maven-bundle-plugin</a></td><td>2.3.7</td></tr><tr class="b"><td>org.apache.maven.plugins</td><td><a class="externalLink" href="http://maven.apache.org/plugins/maven-clean-plugin/">maven-clean-plugin</a></td><td>2.4.1</td></tr><tr class="a"><td>org.apache.maven.plugins</td><td><a class="externalLink" href="http://maven.apache.org/plugins/maven-compiler-plugin/">maven-compiler-plugin</a></td><td>2.3.2</td></tr><tr class="b"><td>org.apache.maven.plugins</td><td><a class="externalLink" href="http://maven.apache.org/plugins/maven-deploy-plugin/">maven-deploy-plugin</a></td><td>2.7</td></tr><tr class="a"><td>org.apache.maven.plugins</td><td><a class="externalLink" href="http://maven.apache.org/plugins/maven-install-plugin/">maven-install-plugin</a></td><td>2.3.1</td></tr><tr class="b"><td>org.apache.maven.plugins</td><td><a class="externalLink" href="http://maven.apache.org/plugins/maven-resources-plugin/">maven-resources-plugin</a></td><td>2.5</td></tr><tr class="a"><td>org.apache.maven.plugins</td><td><a class="externalLink" href="http://maven.apache.org/plugins/maven-site-plugin/">maven-site-plugin</a></td><td>3.0</td></tr><tr class="b"><td>org.apache.maven.plugins</td><td><a class="externalLink" href="http://maven.apache.org/surefire/maven-surefire-plugin">maven-surefire-plugin</a></td><td>2.12</td></tr></table></div><div class="section"><h2>Project Report Plugins<a name="Project_Report_Plugins"></a></h2><a name="Project_Report_Plugins"></a><p>There are no plugins reports defined in the Reporting part of this project.</p></div>
+          
+    
+        <div class="section"><h2>Beverly's design<a name="Beverlys_design"></a></h2>
+            <p>Beverly is predicated on the following object model:
+            </p> 
+            <p>
+                <img src="images/beverly-object-model.png" alt="Beverly object model diagram" />
+            </p>
+            <p>
+                The intention is to declaratively configure the indexing workflow via <a class="externalLink" href="https://wiki.duraspace.org/display/FEDORA35/Digital+Object+Relationships">Fedora's RDF graph</a>.
+                Each object that is indexable is made known to be so by attaching to it an &quot;indexable&quot;
+                Fedora content model. The name of that content model is configurable, but in this diagram it is shown as
+                &quot;indexer:cm&quot;. Shown as a shadow behind &quot;indexer:cm&quot; is &quot;indexer:sdef&quot;, which entails the one 
+                dynamic dissemination that this content model provides: &quot;getIndexMetadata&quot;. In the RELS-INT datastream 
+                of an indexable object (shown here as &quot;content:someObject&quot;), links are made between the datastreams that
+                should be used for index extraction and the transformations that will be used for extracting on those datastreams.
+                </p>
+            <p>The assumption is made that each transformation yields a complete and valid Solr XML record, all of which are
+                then merged and de-duplicated to become the final record for that object.
+            </p>
+               <p> Further, there are indexer objects (shown as &quot;indexer:TEI&quot; and &quot;indexer:MODS&quot;) which supply those very transformations via
+                   a &quot;getIndexingTransformation&quot; dynamic dissemination.
+                For example, an RDF link between datastream content:someContent/MODS and the getIndexingTransformation dissemination
+                of indexer:MODS indicates that running the output of getIndexingTransformation (an XSLT transform) against content:someContent/MODS
+                will produce a valid Solr XML record (which presumably will contain index fields that can be drawnw from
+                descriptive metadata, such as MODS is).
+            </p>
+            <p>
+                It is entirely possible to use external URLs for the targets of these RELS-INT links. The advantage to curating
+                the indexing transformations inside the repository as shown here is that we are able to use the repository's notification
+                facility to take action when an indexing transformation has changed, automatically reindexing all affected objects. This eliminates a
+                huge amount of manual labor which typically takes the form of running many different scripts to redo indexing. It also presents the possibility
+                of &quot;iterative&quot; work correcting or improving an indexing transformation with the opportunity to see the results across many different objects 
+                very quickly.
+            </p>
+            <p>
+                Here is a high-level diagram of Beverly's workflow:
+            </p>
+            <p>
+                <img src="images/beverly-workflows.png" alt="Beverly workflow diagram" />
+            </p>
+        </div>
+    
+
                   </div>
       </div>
     </div>
