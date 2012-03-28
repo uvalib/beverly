@@ -31,8 +31,6 @@
 
 	<scm>
 		<url>https://github.com/uvalib/beverly</url>
-		<connection>git://github.com/uvalib/beverly.git</connection>
-		<developerConnection>git://github.com/uvalib/beverly.git</developerConnection>
 	</scm>
 
 	<properties>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Configuration</title>
+        <author email="ajs6f@virginia.edu">A. Soroka</author>
+    </properties>
+    
+    <body>
+        <section name="Configuration">
+            <p>
+                Beverly uses the <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/cm/ConfigurationAdmin.html">OSGi ConfigAdmin service</a> for its (minimal) configuration.
+                Because we house Beverly in Karaf, we have available simple, easy-to-use machinery to manipulate configuration.
+                In fact, you need do nothing more than place a Java properties 
+                file named <code>edu.virginia.lib.beverly.cfg</code> in the <code>etc</code> folder of your
+                Karaf instance to override Beverly's default settings. You can also use the Karaf command line's <code>config:*</code>
+                commands to dynamically change individual settings, but please be aware that the container will watch
+                any file you put in <code>etc</code> anyway, so changes made there will come online without further intervention.
+            </p>
+            <p>
+                Here is a list of the currently available settings:
+            </p>
+            <table>
+          <thead>
+              <tr>
+                  <td>Name</td>
+                  <td>Default Value</td>
+                  <td>Purpose</td>
+              </tr>
+          </thead>
+                    <tr>
+                        <td>indexable-cm</td>
+                        <td>indexable:cm</td>
+                        <td>The PID of the Fedora content model object that marks an object as being indexable.</td>
+                    </tr>
+                <tr>
+                    <td>indexer-cm</td>
+                    <td>indexer:cm</td>
+                    <td>The PID of the Fedora content model object that marks an object as being an indexer object.</td>
+                </tr>
+                <tr>
+                    <td>indexable-sdef</td>
+                    <td>indexable:sdef</td>
+                    <td>The PID of the Fedora service definition object that supports the getIndexMetadata behavior.</td>
+                </tr>
+                <tr>
+                    <td>solr-update-url</td>
+                    <td>http://localhost:8080/solr/update</td>
+                    <td>The URL of the update service for your Solr index. Future versions of beverly will support more than one index.</td>
+                </tr>
+                <tr>
+                    <td>getIndexingMetadata-port</td>
+                    <td>8193</td>
+                    <td>The port on which to open the Beverly index metadata construction service.</td>
+                </tr>
+                <tr>
+                    <td>solr-datastream</td>
+                    <td>SOLR</td>
+                    <td>The ID of a Fedora datastream for manual override of the index metadata construction. If this datastream is present in an indexable object, the Solr document for transmission to the index will be taken directly from it, instead of being dyanmically constructed.</td>
+                </tr>
+                <tr>
+                    <td>fedora-api-m-queue-name</td>
+                    <td>fedora.apim.update</td>
+                    <td>The name of the JMS queue on which to listen for Fedora update events.</td>
+                </tr>
+                <tr>
+                    <td>fedoraUsername</td>
+                    <td>fedoraAdmin</td>
+                    <td>The name of the user as whom to use API-M against the repositories. API-M is only exercised when an indexer object is purged, at which point all objects containing references to it are stripped of those references to maintain the integrity of the index configuration graph.</td>
+                </tr>
+                <tr>
+                    <td>fedoraPassword</td>
+                    <td>fedoraAdmin</td>
+                    <td>For use with the fedoraUsername setting. If you secure the link between Karaf and Fedora's Webservices by other means, you can avoid using this setting.</td>
+                </tr>
+                
+                
+            </table>
+        </section>
+    </body>
+</document>
