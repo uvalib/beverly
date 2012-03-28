@@ -146,4 +146,18 @@
 			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 		</pluginRepository>
 	</pluginRepositories>
+	
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled> 
+					<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
