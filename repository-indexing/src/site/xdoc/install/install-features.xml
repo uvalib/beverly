@@ -10,8 +10,8 @@
     <body>
         <section name="Install Beverly as a Karaf feature">
             <p>
-                First make the Beverly feature descriptor (which comes in the source as <source>features.xml</source>)
-                available to Karaf, then install the feature. We will assume that your unpacked source is at <source>[BEVERLY_SOURCE]</source>. Then your Karaf
+                First make the Beverly feature descriptor (which comes in the source as <code>features.xml</code>)
+                available to Karaf, then install the feature. We will assume that your unpacked source is at <code>[BEVERLY_SOURCE]</code>. Then your Karaf
                 interaction would look like:
                 <source>
                     karaf> features:addurl [BEVERLY_SOURCE]/features.xml
