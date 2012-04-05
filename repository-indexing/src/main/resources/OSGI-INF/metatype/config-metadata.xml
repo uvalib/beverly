@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.1.0 http://www.osgi.org/xmlns/metatype/v1.1.0/metatype.xsd">
+    
+    <OCD xmlns="" name="Beverly" id="edu.virginia.lib.beverly" description="Configuration for the Beverly indexing system">
+        <AD id="solr-update-url" default="http://localhost:8080/solr/update" type="String" description="URL to which to send Solr update and delete messages." name="solr-update-url"/>
+        <AD id="indexable-cm" default="indexable:cm" type="String" description="The PID of the Fedora content model object that marks an object as being indexable." name="indexable-cm"/>
+        <AD id="indexer-cm" default="indexer:cm" type="String" description="The PID of the Fedora content model object that marks an object as being an indexer object." name="indexer-cm"/>
+        <AD id="indexable-sdef" default="indexable:sdef" type="String" description="The PID of the Fedora service definition object that supports the getIndexMetadata behavior." name="indexable-sdef"/>
+        <AD id="getIndexingMetadata-port" default="8193" type="Integer" description="The port on which to open the Beverly index metadata construction service." name="getIndexingMetadata-port"/>
+        <AD id="solr-datastream" name="solr-datastream" type="String" default="SOLR" description="The ID of a Fedora datastream for manual override of the index metadata construction. If this datastream is present in an indexable object, the Solr document for transmission to the index will be taken directly from it, instead of being dynamically constructed."/>
+        <AD id="fedora-api-m-queue-name" name="fedora-api-m-queue-name" default="fedora.apim.update" description="The name of the JMS queue on which to listen for Fedora update events." type="String"/>
+        <AD id="fedoraUsername" name="fedoraUsername" default="fedoraAdmin" description="The name of the user as whom to use API-M against the repositories. API-M is only exercised when an indexer object is purged, at which point all objects containing references to it are stripped of those references to maintain the integrity of the index configuration graph." type="String"/>
+        <AD id="fedoraPassword" name="fedoraPassword" default="fedoraAdmin" description="For use with the fedoraUsername setting. If you secure the link between Karaf and Fedora's Webservices by other means, you can avoid using this setting." type="String"/>        
+    </OCD>
+    <Designate xmlns="" pid="edu.virginia.lib.beverly">
+        <Object ocdref="edu.virginia.lib.beverly"/>
+    </Designate>
+</MetaData>
