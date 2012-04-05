@@ -23,7 +23,9 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <camelContext id="repository-indexer" xmlns="http://camel.apache.org/schema/blueprint" streamCache="true">
+  <camelContext id="repository-indexer" xmlns="http://camel.apache.org/schema/blueprint" streamCache="true"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:fedora-model="info:fedora/fedora-system:def/model#">
 
     <propertyPlaceholder id="properties" location="blueprint:blueprint.placeholder"/>
 
@@ -36,7 +38,7 @@
       <description>Entry point for all indexing workflows</description>
       <from uri="seda:service:indexing:index"/>
 
-      <!-- add choice of content models to headers for retrieval in xquery expressions -->
+      <!-- add choice of content models to headers for retrieval in xpath expressions -->
       <setHeader headerName="indexablecm">
         <simple>${properties:indexable-cm}</simple>
       </setHeader>
@@ -57,18 +59,12 @@
           <inOut uri="seda:service:repositories:resource-index"/>
           <!-- remove the appropriate no-longer-relevant RELS-INT triples -->
           <split parallelProcessing="true">
-            <xquery>
-              declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-              /rdf:RDF/rdf:Description
-            </xquery>
+            <xpath>/rdf:RDF/rdf:Description</xpath>
             <removeHeader headerName="methodName"/>
             <!-- remove the appropriate no-longer-relevant RELS-INT triple -->
             <setHeader headerName="subject">
               <!-- peel out the indexable subject -->
-              <xquery type="java.lang.String">
-                declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-                /rdf:Description/@rdf:about
-              </xquery>
+              <xpath resultType="java.lang.String">/rdf:Description/@rdf:about</xpath>
             </setHeader>
             <to uri="freemarker:freemarker/atom/removetriples.vm"/>
             <removeHeader headerName="subject"/>
@@ -92,12 +88,7 @@
           <choice>
             <when>
               <description>Does this object have the indexable CM?</description>
-              <xquery>
-                declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-                declare namespace fedora-model="info:fedora/fedora-system:def/model#";
-                declare variable $in.headers.indexablecm as xs:string external;
-                /rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',$in.headers.indexablecm)
-              </xquery>
+              <xpath>/rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',in:header('indexablecm'))</xpath>
               <choice>
                 <when>
                   <description>Is this a purgeDatastream operation?</description>
@@ -114,28 +105,17 @@
             </when>
             <when>
               <description>Does this object have the indexer CM?</description>
-              <xquery>
-                declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-                declare namespace fedora-model="info:fedora/fedora-system:def/model#";
-                declare variable $in.headers.indexercm as xs:string external;
-                /rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',$in.headers.indexercm)
-              </xquery>
+              <xpath>/rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',in:header('indexercm'))</xpath>
               <log loggingLevel="DEBUG" message="Using indexer cm: {{indexer-cm}}"/>
               <!-- Ordinary form to index on an indexer object -->
               <!-- start by getting the indexed (dependent) datastreams -->
               <to uri="freemarker:freemarker/sparql/getindexeddatastreams.vm"/>
               <inOut uri="seda:service:repositories:resource-index"/>
               <split stopOnException="true" parallelProcessing="true">
-                <xquery>
-                  declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-                  /rdf:RDF/rdf:Description
-                </xquery>
+                <xpath>/rdf:RDF/rdf:Description</xpath>
                 <setHeader headerName="pid">
                   <!-- peel out the pid itself -->
-                  <xquery type="java.lang.String">
-                    declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-                    substring-before(substring-after(/rdf:Description/@rdf:about,'/'),'/')
-                  </xquery>
+                  <xpath resultType="java.lang.String">substring-before(substring-after(/rdf:Description/@rdf:about,'/'),'/')</xpath>
                 </setHeader>
                 <removeHeader headerName="methodName"/>
                 <to uri="seda:service:indexing:index"/>
@@ -192,17 +172,17 @@
 
           <split stopOnException="true" parallelProcessing="false"
             strategyRef="simpleXMLRecursiveMergeStrategy">
-            <xpath>/RDF/Description</xpath>
+            <xpath>/rdf:RDF/rdf:Description</xpath>
             <!-- transform a single metadata stream against its XSLT -->
             <log
               message="One of the split RDF descriptions: in.body = ${in.body} and out.body = ${out.body}"/>
             <!-- stick stylesheet URL in a header -->
             <setHeader headerName="stylesheetURL">
-              <xpath resultType="java.lang.String">/Description/isIndexedBy/@resource</xpath>
+              <xpath resultType="java.lang.String">/rdf:Description/isIndexedBy/@rdf:resource</xpath>
             </setHeader>
             <!-- replace body with XML datastream -->
             <setHeader headerName="CamelHttpUri">
-              <xpath resultType="java.lang.String">/Description/@about</xpath>
+              <xpath resultType="java.lang.String">/rdf:Description/@rdf:about</xpath>
             </setHeader>
             <setHeader headerName="CamelHttpMethod">
               <constant>GET</constant>
@@ -228,10 +208,7 @@
     <route>
       <from uri="jms:queue:{{fedora-api-m-queue-name}}"/>
       <setHeader headerName="repositoryURL">
-        <xquery type="java.lang.String">
-          declare namespace atom="http://www.w3.org/2005/Atom";
-          /atom:entry/atom:author/atom:uri
-        </xquery>
+        <xpath resultType="java.lang.String">/atom:entry/atom:author/atom:uri</xpath>
       </setHeader>
       <to uri="seda:service:indexing:index"/>
     </route>
@@ -305,7 +282,7 @@
   </camelContext>
 
   <bean id="simpleXMLRecursiveMergeStrategy"
-    class="edu.virginia.lib.ole.esb.aggregation.SimpleXMLRecursiveMergeStrategy"/>
+    class="edu.virginia.lib.camel.aggregation.SimpleXMLRecursiveMergeStrategy"/>
 
   <bean id="tFactory" class="net.sf.saxon.TransformerFactoryImpl"/>
   
