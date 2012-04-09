@@ -138,7 +138,13 @@
       <to uri="http://fedora/getIndexingMetadata"/>
       <removeHeader headerName="CamelHttpUri"/>
       <removeHeader headerName="CamelHttpMethod"/>
-      <to uri="{{solr-update-url}}"/>
+      <setHeader headerName="Content-Type">
+        <constant>text/xml</constant>
+      </setHeader>
+      <setHeader headerName="CamelHttpMethod">
+        <constant>POST</constant>
+      </setHeader>
+      <to uri="{{solr-update-url}}?httpClient.connectionManagerTimeout=15000"/>
     </route>
 
     <route>
