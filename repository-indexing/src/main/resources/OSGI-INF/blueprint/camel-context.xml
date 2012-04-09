@@ -37,22 +37,21 @@
     <route>
       <description>Entry point for all indexing workflows</description>
       <from uri="seda:service:indexing:index"/>
-
-      <!-- add choice of content models to headers for retrieval in xpath expressions -->
-      <setHeader headerName="indexablecm">
-        <simple>${properties:indexable-cm}</simple>
-      </setHeader>
-      <setHeader headerName="indexercm">
-        <simple>${properties:indexer-cm}</simple>
-      </setHeader>
-
+      
       <choice>
         <when>
           <description>Is this a purgeObject operation?</description>
           <simple>${header.methodName} == 'purgeObject'</simple>
           <!-- fire a Solr delete operation at the index, in case it was an indexable object -->
           <to uri="freemarker:freemarker/solr/delete.vm"/>
+          <setHeader headerName="Content-Type">
+            <constant>text/xml</constant>
+          </setHeader>
+          <setHeader headerName="CamelHttpMethod">
+            <constant>POST</constant>
+          </setHeader>
           <to uri="{{solr-update-url}}"/>
+          <removeHeader headerName="CamelHttpMethod"/>
           <!-- but also assume that it might have been an indexer object -->
           <!-- first gather the affected objects -->
           <to uri="freemarker:freemarker/sparql/getindexedobjects.vm"/>
@@ -88,7 +87,7 @@
           <choice>
             <when>
               <description>Does this object have the indexable CM?</description>
-              <xpath>/rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',in:header('indexablecm'))</xpath>
+              <xpath>/rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',function:properties('indexable-cm'))</xpath>
               <choice>
                 <when>
                   <description>Is this a purgeDatastream operation?</description>
@@ -105,7 +104,7 @@
             </when>
             <when>
               <description>Does this object have the indexer CM?</description>
-              <xpath>/rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',in:header('indexercm'))</xpath>
+              <xpath>/rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',function:properties('indexer-cm'))</xpath>
               <log loggingLevel="DEBUG" message="Using indexer cm: {{indexer-cm}}"/>
               <!-- Ordinary form to index on an indexer object -->
               <!-- start by getting the indexed (dependent) datastreams -->
