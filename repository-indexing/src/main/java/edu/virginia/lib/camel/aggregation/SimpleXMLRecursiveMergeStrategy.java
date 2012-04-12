@@ -8,8 +8,7 @@ import java.util.regex.Pattern;
 import org.apache.camel.Exchange;
 import org.apache.camel.StringSource;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.osgi.service.log.LogService;
 
 /**
  * @author ajs6f
@@ -17,8 +16,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SimpleXMLRecursiveMergeStrategy implements AggregationStrategy {
 
-	private final static Log log = LogFactory
-			.getLog(SimpleXMLRecursiveMergeStrategy.class);
+	private LogService log;
 
 	private final static String XMLHEADER = "<\\?xml.+?\\?>";
 
@@ -41,15 +39,27 @@ public class SimpleXMLRecursiveMergeStrategy implements AggregationStrategy {
 		String oldXML = oldExchange.getIn().getBody(String.class);
 		// remove XML declaration
 		oldXML = XMLHEADERREGEXP.matcher(oldXML).replaceAll("");
-		log.debug("oldXML = " + oldXML);
+		debug("oldXML = " + oldXML);
 		String newXML = newExchange.getIn().getBody(String.class);
 		// remove XML declaration
 		newXML = XMLHEADERREGEXP.matcher(newXML).replaceAll("");
-		log.debug("newXML = " + newXML);
+		debug("newXML = " + newXML);
 		String mergedXML = "<wrapper>" + oldXML + newXML + "</wrapper>";
 		oldExchange.getIn().setBody(new StringSource(mergedXML));
 
 		return oldExchange;
+	}
+	
+	private void debug (String msg) {
+		log.log(LogService.LOG_DEBUG, msg);
+	}
+	
+	public LogService getLog() {
+		return log;
+	}
+
+	public void setLog(LogService log) {
+		this.log = log;
 	}
 
 }

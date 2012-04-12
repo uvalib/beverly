@@ -5,7 +5,7 @@
     <name>indexing</name>
     <uri>${headers.repositoryURL}</uri>
   </author>
-  <title type="text">getDatastream</title>
+  <title type="text">getDatastreamDissemination</title>
   <category term="${headers.pid}" scheme="fedora-types:pid" label="xsd:string"/>
   <category term="${headers.libDatastream}" scheme="fedora-types:dsID" label="xsd:string"/>
 </entry>

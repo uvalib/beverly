@@ -8,8 +8,7 @@
   http://camel.apache.org/schema/blueprint https://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
 
   <!-- OSGI blueprint property placeholder -->
-  <cm:property-placeholder id="blueprint.placeholder"
-    persistent-id="edu.virginia.lib.beverly">
+  <cm:property-placeholder id="blueprint.placeholder" persistent-id="edu.virginia.lib.beverly">
     <cm:default-properties>
       <cm:property name="indexable-cm" value="indexable:cm"/>
       <cm:property name="indexable-sdef" value="indexable:sdef"/>
@@ -20,12 +19,17 @@
       <cm:property name="fedora-api-m-queue-name" value="fedora.apim.update"/>
       <cm:property name="fedoraPassword" value="fedoraAdmin"/>
       <cm:property name="fedoraUsername" value="fedoraAdmin"/>
+      <cm:property name="xmlTypes"
+        value="text/xml,application/xml,application/xhtml+xml,application/rdf+xml"/>
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <camelContext id="repository-indexer" xmlns="http://camel.apache.org/schema/blueprint" streamCache="true"
-    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:atom="http://www.w3.org/2005/Atom"
-    xmlns:fedora-model="info:fedora/fedora-system:def/model#">
+  <camelContext id="repository-indexer" xmlns="http://camel.apache.org/schema/blueprint"
+    streamCache="true" trace="false" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+    xmlns:fedora-management="http://www.fedora.info/definitions/1/0/management/"
+    xmlns:fedora-types="http://www.fedora.info/definitions/1/0/types/">
 
     <propertyPlaceholder id="properties" location="blueprint:blueprint.placeholder"/>
 
@@ -37,7 +41,7 @@
     <route>
       <description>Entry point for all indexing workflows</description>
       <from uri="seda:service:indexing:index"/>
-      
+
       <choice>
         <when>
           <description>Is this a purgeObject operation?</description>
@@ -162,7 +166,7 @@
           <setHeader headerName="libDatastream">
             <constant>{{solr-datastream}}</constant>
           </setHeader>
-          <to uri="freemarker:freemarker/atom/getdatastream.vm"/>
+          <to uri="freemarker:freemarker/atom/getDatastreamDissemination.vm"/>
           <inOut uri="seda:service:repositories:api-a"/>
         </when>
         <otherwise>
@@ -181,27 +185,52 @@
             <!-- transform a single metadata stream against its XSLT -->
             <log
               message="One of the split RDF descriptions: in.body = ${in.body} and out.body = ${out.body}"/>
-            <!-- stick stylesheet URL in a header -->
-            <setHeader headerName="stylesheetURL">
+
+            <!-- use this header to select the transform dynamically
+                atomtosoap.xsl below is just a dummy -->
+            <setHeader headerName="stylesheetUrl">
               <xpath resultType="java.lang.String">/rdf:Description/isIndexedBy/@rdf:resource</xpath>
             </setHeader>
-            <!-- replace body with XML datastream -->
-            <setHeader headerName="CamelHttpUri">
+            <setHeader headerName="contentUrl">
               <xpath resultType="java.lang.String">/rdf:Description/@rdf:about</xpath>
+            </setHeader>
+            <setHeader headerName="libDatastream">
+              <xpath resultType="java.lang.String">substring-before(substring-after(/rdf:Description/@rdf:about,concat(in:header('repositoryURL'),'/objects/',in:header('pid'),'/datastreams/')),'/content')</xpath>
+            </setHeader>
+            <!-- replace body with datastream content -->
+            <to uri="freemarker:freemarker/atom/getDatastream.vm"/>
+            <inOut uri="seda:service:repositories:api-m"/>
+            <log message="Retrieved datastream metadata: ${in.body}"/>
+
+            <setHeader headerName="MIMEType"> 
+              <xpath resultType="java.lang.String">/fedora-types:getDatastreamResponse/datastream/MIMEType</xpath>
+            </setHeader>
+            <log message="Found MIMEType ${in.headers.MIMEType}"></log>
+            <setHeader headerName="xmlMIMEType">
+              <xpath resultType="java.lang.Boolean">not(contains(function:properties('xmlTypes'),in:header('MIMEType')))</xpath>  
+            </setHeader>
+            <!-- fetch the datastream -->
+            <setHeader headerName="CamelHttpUri">
+              <header>contentUrl</header>
             </setHeader>
             <setHeader headerName="CamelHttpMethod">
               <constant>GET</constant>
             </setHeader>
-            <!-- this url is a dummy: the real URL is in CamelHttpUrl header
-              see: http://camel.apache.org/http.html -->
-            <to uri="http://www.example.com"/>
+            <to uri="http://example.com"/>
             <removeHeader headerName="CamelHttpUri"/>
             <removeHeader headerName="CamelHttpMethod"/>
-            <!-- use this header to select the transform dynamically
-                atomtosoap.xsl below is just a dummy -->
+
+            <when>
+              <description>If datastream is not XML, use Tika</description>
+              <header>xmlMIMEType</header>
+              <log message="Sending to Tika"/>
+              <inOut uri="bean:tikaParser?method=parse"/>
+            </when>
+            
             <setHeader headerName="CamelXsltResourceUri">
-              <simple>${header.stylesheetURL}</simple>
+              <simple>${headers.stylesheetUrl}</simple>
             </setHeader>
+            <log message="About to run a single-datastream transform"></log>
             <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"/>
             <removeHeader headerName="CamelXsltResourceUri"/>
           </split>
@@ -209,7 +238,7 @@
         </otherwise>
       </choice>
     </route>
-    
+ 
     <route>
       <from uri="jms:queue:{{fedora-api-m-queue-name}}"/>
       <setHeader headerName="repositoryURL">
@@ -217,10 +246,10 @@
       </setHeader>
       <to uri="seda:service:indexing:index"/>
     </route>
-    
+
     <route>
       <from uri="seda:service:repositories:api-a"/>
-      <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"></inOut>
+      <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"/>
       <setHeader headerName="CamelHttpMethod">
         <constant>POST</constant>
       </setHeader>
@@ -232,18 +261,20 @@
       <setHeader headerName="SOAPAction">
         <constant>dummy</constant>
       </setHeader>
-      <log message="Sending SOAP message to repository: in.body = ${in.body} and out.body = ${out.body}"/>
-      
+      <log
+        message="Sending SOAP message to repository: in.body = ${in.body} and out.body = ${out.body}"/>
+
       <!-- default repo API-A url -->
       <to
         uri="http:fedora/services/access?authMethod=Basic&amp;authUsername={{fedoraUsername}}&amp;authPassword={{fedoraPassword}}&amp;httpClient.soTimeout=6000"/>
       <removeHeader headerName="SOAPAction"/>
       <removeHeader headerName="CamelHttpUri"/>
+      <to uri="xslt:xslt/strip-soap.xsl?transformerFactory=tFactory"/>
     </route>
-    
+
     <route>
       <from uri="seda:service:repositories:api-m"/>
-      <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"></inOut>
+      <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"/>
       <setHeader headerName="CamelHttpMethod">
         <constant>POST</constant>
       </setHeader>
@@ -255,12 +286,13 @@
       <setHeader headerName="CamelHttpUri">
         <simple>${headers.repositoryURL}/services/management?httpClient.authenticationPreemptive=true&amp;username={{fedoraUsername}}&amp;password={{fedoraPassword}}</simple>
       </setHeader>
-      <!-- dummy repo API-A url -->
+      <!-- dummy repo API-M url -->
       <to uri="http:fedora/services/management?httpClient.soTimeout=6000"/>
       <removeHeader headerName="SOAPAction"/>
       <removeHeader headerName="CamelHttpUri"/>
+      <to uri="xslt:xslt/strip-soap.xsl?transformerFactory=tFactory"/>
     </route>
-    
+
     <route>
       <from uri="seda:service:repositories:resource-index"/>
       <setHeader headerName="Content-Type">
@@ -287,31 +319,23 @@
   </camelContext>
 
   <bean id="simpleXMLRecursiveMergeStrategy"
-    class="edu.virginia.lib.camel.aggregation.SimpleXMLRecursiveMergeStrategy"/>
+    class="edu.virginia.lib.camel.aggregation.SimpleXMLRecursiveMergeStrategy">
+    <property name="log" ref="log"/>
+  </bean>
 
-  <bean id="tFactory" class="net.sf.saxon.TransformerFactoryImpl"/>
-  
+  <bean id="tikaParser" class="edu.virginia.lib.camel.parsing.TikaParser">
+    <property name="log" ref="log"/>
+  </bean>  
+
+  <bean id="tFactory" class="net.sf.saxon.TransformerFactoryImpl"/>  
+
+  <reference id="log" interface="org.osgi.service.log.LogService"/>
+
   <!-- use CF from ActiveMQ blueprint service running in container -->
-  <reference id="connectionFactory" interface="javax.jms.ConnectionFactory" />
+  <reference id="connectionFactory" interface="javax.jms.ConnectionFactory"/>
   <bean id="jms" class="org.apache.camel.component.jms.JmsComponent">
-    <property name="connectionFactory" ref="connectionFactory" />
+    <property name="connectionFactory" ref="connectionFactory"/>
   </bean>
 
-  <!--
-  <bean id="http" class="org.apache.camel.component.http.HttpComponent">
-    <property name="camelContext" ref="repository-indexer"/>
-    <property name="httpConnectionManager" ref="myHttpConnectionManager"/>
-  </bean>
-
-  <bean id="myHttpConnectionManager"
-    class="org.apache.commons.httpclient.MultiThreadedHttpConnectionManager">
-    <property name="params" ref="myHttpConnectionManagerParams"/>
-  </bean>
-
-  <bean id="myHttpConnectionManagerParams"
-    class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">
-    <property name="defaultMaxConnectionsPerHost" value="15"/>
-    <property name="maxTotalConnections" value="15"/>
-  </bean>
-  -->
+ 
 </blueprint>

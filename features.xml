@@ -15,5 +15,7 @@
         <feature version="2.9.1">camel-jms</feature>
         <feature version="2.9.1">camel-jetty</feature>
         <feature version="2.9.1">camel-freemarker</feature>
+        <bundle dependency="true" start="true">mvn:org.apache.tika/tika-core/1.0</bundle>
+        <bundle dependency="true" start="true">mvn:org.apache.tika/tika-bundle/1.0</bundle>
     </feature>
 </features>
