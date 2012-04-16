@@ -19,6 +19,7 @@
       <cm:property name="fedora-api-m-queue-name" value="fedora.apim.update"/>
       <cm:property name="fedoraPassword" value="fedoraAdmin"/>
       <cm:property name="fedoraUsername" value="fedoraAdmin"/>
+      <cm:property name="solr-http-timeout" value="60000"/>
       <cm:property name="xmlTypes"
         value="text/xml,application/xml,application/xhtml+xml,application/rdf+xml"/>
     </cm:default-properties>
@@ -147,7 +148,7 @@
       <setHeader headerName="CamelHttpMethod">
         <constant>POST</constant>
       </setHeader>
-      <to uri="{{solr-update-url}}?httpClient.connectionManagerTimeout=15000"/>
+      <to uri="{{solr-update-url}}?httpClient.connectionManagerTimeout={{solr-http-timeout}}&amp;httpClient.soTimeout={{solr-http-timeout}}"/>
     </route>
 
     <route>

@@ -14,6 +14,7 @@
         <AD id="fedoraUsername" name="fedoraUsername" default="fedoraAdmin" description="The name of the user as whom to use API-M against the repositories. API-M is only exercised when an indexer object is purged, at which point all objects containing references to it are stripped of those references to maintain the integrity of the index configuration graph." type="String"/>
         <AD id="fedoraPassword" name="fedoraPassword" default="fedoraAdmin" description="For use with the fedoraUsername setting. If you secure the link between Karaf and Fedora's Webservices by other means, you can avoid using this setting." type="String"/>        
         <AD id="xmlTypes" name="xmlTypes" default="text/xml,application/xml,application/xhtml+xml,application/rdf+xml" description="MIMEtypes that will not be passed through Tika parsing prior to XSLT execution." type="String"/>        
+        <AD id="solr-http-timeout" name="solr-http-timeout" default="60000" description="Time to wait for Solr index server to respond to messages." type="Integer"/>        
         
     </OCD>
     <Designate xmlns="" pid="edu.virginia.lib.beverly">
