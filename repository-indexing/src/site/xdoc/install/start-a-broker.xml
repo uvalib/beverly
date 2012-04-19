@@ -12,7 +12,7 @@
             <p>Using the Karaf shell:
                     <source>
                         karaf> features:addurl  http://repo1.maven.org/maven2/org/apache/activemq/activemq-karaf/5.5.1/activemq-karaf-5.5.1-features.xml
-                        karaf> features:install activemq-broker
+                        karaf> features:install activemq-blueprint
                         karaf> activemq:create-broker -t blueprint
                     </source>
             </p>
