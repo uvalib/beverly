@@ -1,10 +1,10 @@
 type=triples&format=RDF/XML&lang=sparql&query=
 
-PREFIX uva-lib: <http://fedora.lib.virginia.edu/relationships#>
+PREFIX prefix: <${headers.predicatePrefix}>
 
-construct { ?datastream <uva-lib:isIndexedBy> ?xslt . }
+construct { ?datastream <prefix:${headers.predicate}> ?xslt . }
 WHERE
 {
   <info:fedora/${headers.pid}> <fedora-view:disseminates> ?datastream .
-  ?datastream <uva-lib:isIndexedBy>  ?xslt .
+    ?datastream <prefix:${headers.predicate}>  ?xslt .
 }  

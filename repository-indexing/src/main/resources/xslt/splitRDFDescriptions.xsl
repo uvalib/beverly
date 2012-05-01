@@ -10,7 +10,7 @@
             <xsl:for-each select="rdf:Description">
                 <xsl:for-each select="*[@rdf:resource]">
                     <rdf:Description rdf:about="{../@rdf:about}">
-                        <isIndexedBy rdf:resource="{@rdf:resource}"/>
+                        <xsl:copy-of select="." />
                     </rdf:Description>
                 </xsl:for-each>
             </xsl:for-each>
