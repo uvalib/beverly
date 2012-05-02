@@ -13,7 +13,6 @@
       <cm:property name="indexable-cm" value="indexable:cm"/>
       <cm:property name="indexer-predicate" value="http://fedora.lib.virginia.edu/relationships#isIndexedBy" />
       <cm:property name="indexable-sdef" value="indexable:sdef"/>
-      <cm:property name="dependency-predicate" value="http://fedora.lib.virginia.edu/relationships#isDependentOn" /> 
       <cm:property name="solr-update-url" value="http://localhost:8080/solr/update" />
       <cm:property name="getIndexingMetadata-port" value="8193"/>
       <cm:property name="indexer-cm" value="indexer:cm"/>
@@ -118,23 +117,11 @@
               <log loggingLevel="DEBUG" message="Using indexer cm: {{indexer-cm}}"/>
               <!-- Ordinary form to index on an indexer object -->
               <!-- start by getting the indexed (dependent) datastreams -->
-              <setHeader headerName="dependencyPredicatePrefix">
-                <xpath resultType="java.lang.String">concat(substring-before(function:properties('dependency-predicate'), '#'), '#')</xpath>
-              </setHeader>
-              <setHeader headerName="dependencyPredicate">
-                <xpath resultType="java.lang.String">substring-after(function:properties('dependency-predicate'), '#')</xpath>
-              </setHeader>
-              <setHeader headerName="indexerPredicatePrefix">
-                <xpath resultType="java.lang.String">concat(substring-before(function:properties('indexer-predicate'), '#'), '#')</xpath>
-              </setHeader>
               <setHeader headerName="indexerPredicate">
-                <xpath resultType="java.lang.String">substring-after(function:properties('indexer-predicate'), '#')</xpath>
+                <xpath resultType="java.lang.String">function:properties('indexer-predicate')</xpath>
               </setHeader>
               <to uri="freemarker:freemarker/sparql/getindexeddatastreams.vm"/>
-              <removeHeader headerName="dependencyPredicate" />
-              <removeHeader headerName="dependencyPredicatePrefix" />
               <removeHeader headerName="indexerPredicate" />
-              <removeHeader headerName="indexerPredicatePrefix" />
               <inOut uri="seda:service:repositories:resource-index"/>
               <setHeader headerName="count">
                 <xpath resultType="java.lang.String">count(/rdf:RDF/rdf:Description)</xpath>
@@ -207,13 +194,11 @@
         <otherwise>
           <description>Create indexing metadata from datastreams</description>
           <log message="No datastream &quot;{{solr-datastream}}&quot; found, will generate solr document." />
-          <setHeader headerName="predicatePrefix">
-            <xpath resultType="java.lang.String">concat(substring-before(function:properties('indexer-predicate'), '#'), '#')</xpath>
-          </setHeader>
-          <setHeader headerName="predicate">
-            <xpath resultType="java.lang.String">substring-after(function:properties('indexer-predicate'), '#')</xpath>
+          <setHeader headerName="indexerPredicate">
+            <xpath resultType="java.lang.String">function:properties('indexer-predicate')</xpath>
           </setHeader>
           <to uri="freemarker:freemarker/sparql/getindexabledatastreams.vm"/>
+          <removeHeader headerName="indexerPredicate" />
           <inOut uri="seda:service:repositories:resource-index"/>
           <inOut uri="xslt:xslt/concretizeURIs.xsl?transformerFactory=tFactory"/>
           <inOut uri="xslt:xslt/splitRDFDescriptions.xsl?transformerFactory=tFactory"/>

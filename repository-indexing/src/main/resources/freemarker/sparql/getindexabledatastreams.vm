@@ -1,10 +1,8 @@
 type=triples&format=RDF/XML&lang=sparql&query=
 
-PREFIX prefix: <${headers.predicatePrefix}>
-
-construct { ?datastream <prefix:${headers.predicate}> ?xslt . }
+construct { ?datastream <${headers.indexerPredicate}> ?xslt . }
 WHERE
 {
   <info:fedora/${headers.pid}> <fedora-view:disseminates> ?datastream .
-    ?datastream <prefix:${headers.predicate}>  ?xslt .
+    ?datastream <${headers.indexerPredicate}>  ?xslt .
 }  
