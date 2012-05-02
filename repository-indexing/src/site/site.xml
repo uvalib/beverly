@@ -22,6 +22,7 @@
       <item name="Design" href="design.html"></item>
       <item name="Installation" href="install.html"/>
       <item name="Configuration" href="config.html"/> 
+      <item name="Usage" href="usage/usage.html"/>
       <item name="Why not GSearch?" href="why-not-gsearch.html"/>
       <item name="Publications" href="publications.html"/>
     </menu>

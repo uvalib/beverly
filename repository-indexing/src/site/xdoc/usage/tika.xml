@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Using Tika</title>
+        <author email="ajs6f@virginia.edu">A. Soroka</author>
+    </properties>
+    <body>
+        <section name="When is Tika engaged?">
+            <p>
+                Tika is brought into play when a datastream is determined to have a MIME-type other than those
+                recorded in the configuration setting "xmlTypes". This is based entirely on Fedora's determination, so 
+                it is necessary to record accurate MIME-types for datastreams in the repositories.
+            </p>
+        </section>
+        <section name="What does Tika do?">
+            <p><a href="https://tika.apache.org">Apache Tika</a> is used to extract metadata from
+            non-XML datastreams. When such are presented to Beverly (by being referenced in RELS-INT
+            of an indexable object) they are first presented to Tika and what metadata Tika can
+            extract are serialized in XML form. Each field is put into an XML element of that
+            name and all of them are wrapped in a "Metadata" element. For example:
+                <source>
+                    &lt;Metadata&gt;
+                        &lt;Content-Type&gt;image/jpeg&lt;/Content-Type&gt;
+                    &lt;Metadata/&gt;
+                </source>
+                XSLT can then act on this result in the same way as on XML metadata.
+            </p>
+        </section>
+        <section name="What will Tika give you?">
+            <p>That's up to Tika. Tika will extract what it can from any bitstream with which it is presented
+            with no more clue than the MIME-type that Fedora provides. For more information on what Tika can do, 
+                <a href="https://tika.apache.org/1.1/formats.html">check it out</a>.</p>
+        </section>
+    </body>
+</document>

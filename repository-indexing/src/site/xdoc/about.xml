@@ -23,8 +23,9 @@
         <section name="Properties">
             <p>      Beverly relies on Fedora's ability to <a href="https://wiki.duraspace.org/display/FEDORA35/Messaging">publish events</a>
                 about changes to repository contents.
-                The configuration for indexing workflows is held in the repositories right next to the objects being indexed, in Fedora's internal RDF graph. Currently, Beverly is limited
-            to indexing XML metadata, but that will hopefully not be the case for much longer. Indexing transformations are written in XSLT. </p>
+                The configuration for indexing workflows is held in the repositories right next to the objects being indexed, in Fedora's internal RDF graph. Beverly can
+                index XML metadata, or using <a href="usage/tika.html">Apache Tika</a>, it can extract description from non-XML data and convert it to 
+             XML form for indexing. Indexing transformations are written in XSLT. </p>
                
         </section>
     </body>
