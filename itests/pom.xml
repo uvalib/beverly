@@ -27,7 +27,7 @@
 
 	<build>
 		<testResources>
-			<!-- copy Fedora home -->
+			<!-- copy Fedora home to be used by integration tests -->
 			<testResource>
 				<directory>${basedir}/src/test/resources/fedora-home</directory>
 				<targetPath>${project.build.directory}/fedora-home</targetPath>
@@ -85,7 +85,6 @@
 							<cargo.servlet.uriencoding>UTF-8</cargo.servlet.uriencoding>
 							<!-- Fedora + Solr?! In one JVM!? What a pig!! -->
 							<cargo.jvmargs>-XX:MaxPermSize=384M -Xmx512M</cargo.jvmargs>
-
 						</properties>
 					</configuration>
 					<container>
@@ -137,7 +136,7 @@
 						</goals>
 					</execution>
 				</executions>
-				<version>2.9</version>
+				<version>2.12</version>
 			</plugin>
 		</plugins>
 		<pluginManagement>
@@ -183,7 +182,6 @@
 	</build>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>edu.virginia.lib</groupId>
 			<artifactId>repository-indexing</artifactId>
@@ -221,14 +219,14 @@
 			<version>12.0</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- dependencies for Fedora -->
+		<!-- dependencies for launching Fedora for integration tests -->
 		<dependency>
 			<groupId>org.fcrepo</groupId>
 			<artifactId>fcrepo-webapp-fedora</artifactId>
 			<version>3.5</version>
 			<type>war</type>
 		</dependency>
-		<!-- dependencies for Solr -->
+		<!-- dependencies for Solr ditto -->
 		<dependency>
 			<artifactId>solr</artifactId>
 			<groupId>org.apache.solr</groupId>
@@ -240,8 +238,7 @@
 	<repositories>
 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
-			<name>SpringSource Enterprise Bundle Repository - External Bundle
-			Releases</name>
+			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
 		</repository>
 		<repository>
