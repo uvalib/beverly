@@ -1,0 +1,6 @@
+# to make the solrconfig generic, and sharable between different solr indexes
+# you should define the property solr.solr.home on the line below, with the 
+# value set to the full path of the solr home directory.
+
+#solr.solr.home=/usr/local/projects/debugging/solr
+#solr.solr.home=/lib_content27/solr/indexing

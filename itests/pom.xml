@@ -14,9 +14,30 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<pax.exam.version>2.3.1</pax.exam.version>
+		<fedora.home>${project.build.directory}/fedora-home</fedora.home>
+		<javax.net.ssl.trustStore>${fedora.home}/server/truststore</javax.net.ssl.trustStore>
+		<javax.net.ssl.trustStorePassword>tomcat</javax.net.ssl.trustStorePassword>
+		<fedora.username>fedoraAdmin</fedora.username>
+		<fedora.password>fedoraAdmin</fedora.password>
+		<fedora.hostname>localhost</fedora.hostname>
+		<fedora.port>8080</fedora.port>
+		<fedora.appServerContext>fedora</fedora.appServerContext>
+		<solr.home>${project.build.directory}/solr-home</solr.home>
 	</properties>
 
 	<build>
+		<testResources>
+			<!-- copy Fedora home -->
+			<testResource>
+				<directory>${basedir}/src/test/resources/fedora-home</directory>
+				<targetPath>${project.build.directory}/fedora-home</targetPath>
+			</testResource>
+			<!-- ditto for Solr -->
+			<testResource>
+				<directory>${basedir}/src/test/resources/solr-home</directory>
+				<targetPath>${project.build.directory}/solr-home</targetPath>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -37,6 +58,86 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+				<version>1.2.1</version>
+				<configuration>
+					<configuration>
+						<deployables>
+							<deployable>
+								<artifactId>fcrepo-webapp-fedora</artifactId>
+								<groupId>org.fcrepo</groupId>
+								<type>war</type>
+								<properties>
+									<!-- put our test deployment in URL tree -->
+									<context>${fedora.appServerContext}</context>
+								</properties>
+							</deployable>
+							<deployable>
+								<artifactId>solr</artifactId>
+								<groupId>org.apache.solr</groupId>
+								<type>war</type>
+							</deployable>
+						</deployables>
+						<properties>
+							<cargo.servlet.uriencoding>UTF-8</cargo.servlet.uriencoding>
+							<!-- Fedora + Solr?! In one JVM!? What a pig!! -->
+							<cargo.jvmargs>-XX:MaxPermSize=384M -Xmx512M</cargo.jvmargs>
+
+						</properties>
+					</configuration>
+					<container>
+						<containerId>tomcat7x</containerId>
+						<zipUrlInstaller>
+							<url>https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.zip</url>
+							<downloadDir>${project.build.directory}/downloads</downloadDir>
+							<extractDir>${project.build.directory}/extracts</extractDir>
+						</zipUrlInstaller>
+						<log>${project.build.directory}/tomcat.log</log>
+						<systemProperties>
+							<!-- Here's where we hook Fedora up with a Fedora-home -->
+							<fedora.home>${fedora.home}</fedora.home>
+							<javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
+							<javax.net.ssl.trustStorePassword>${javax.net.ssl.trustStorePassword}</javax.net.ssl.trustStorePassword>
+							<!-- Here's where we hook Solr up with a Solr-home -->
+							<solr.solr.home>${solr.home}</solr.solr.home>
+						</systemProperties>
+					</container>
+				</configuration>
+				<executions>
+					<!-- starting container prior to integration tests -->
+					<execution>
+						<id>start-container</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<!-- stopping container after integration tests -->
+					<execution>
+						<id>stop-container</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- no reason to run unit tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+				<version>2.9</version>
 			</plugin>
 		</plugins>
 		<pluginManagement>
@@ -95,14 +196,6 @@
 			<version>0.5.3</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.ops4j.pax.exam</groupId>
-			<artifactId>pax-exam</artifactId>
-			<version>${pax.exam.version}</version>
-			<scope>test</scope>
-		</dependency>
-		 -->
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
 			<artifactId>pax-exam-junit4</artifactId>
@@ -122,19 +215,25 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency> <groupId>org.apache.felix</groupId> <artifactId>org.apache.felix.framework</artifactId> 
-			<version>1.0.0</version> </dependency> <dependency> <groupId>org.apache.felix</groupId> 
-			<artifactId>org.apache.felix.bundlerepository</artifactId> <version>1.2.1</version> 
-			</dependency> <dependency> <groupId>org.apache.karaf.tooling</groupId> <artifactId>org.apache.karaf.tooling.testing</artifactId> 
-			<version>2.2.7</version> <scope>test</scope> </dependency> <dependency> <groupId>org.apache.karaf.tooling.exam</groupId> 
-			<artifactId>org.apache.karaf.tooling.exam.container</artifactId> <version>3.0.0-SNAPSHOT</version> 
-			<scope>test</scope> </dependency> <dependency> <groupId>junit</groupId> <artifactId>junit</artifactId> 
-			<version>4.10</version> <scope>test</scope> </dependency> -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>12.0</version>
 			<scope>test</scope>
+		</dependency>
+		<!-- dependencies for Fedora -->
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-webapp-fedora</artifactId>
+			<version>3.5</version>
+			<type>war</type>
+		</dependency>
+		<!-- dependencies for Solr -->
+		<dependency>
+			<artifactId>solr</artifactId>
+			<groupId>org.apache.solr</groupId>
+			<type>war</type>
+			<version>3.6.0</version>
 		</dependency>
 	</dependencies>
 
@@ -150,6 +249,5 @@
 			<name>Apache Public Releases</name>
 			<url>https://repository.apache.org/content/groups/public/</url>
 		</repository>
-
 	</repositories>
 </project>

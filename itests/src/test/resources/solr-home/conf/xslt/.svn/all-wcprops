@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/index/!svn/ver/20/solr-home/trunk/dev_index/solr/conf/xslt
+END
+example.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/index/!svn/ver/20/solr-home/trunk/dev_index/solr/conf/xslt/example.xsl
+END
+example_atom.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/repos/index/!svn/ver/20/solr-home/trunk/dev_index/solr/conf/xslt/example_atom.xsl
+END
+example_rss.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/repos/index/!svn/ver/20/solr-home/trunk/dev_index/solr/conf/xslt/example_rss.xsl
+END

@@ -2,15 +2,7 @@ package edu.virginia.lib.beverly;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
-import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.logLevel;
-import static org.ops4j.pax.exam.CoreOptions.compendiumProfile;
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,11 +15,9 @@ import org.apache.felix.service.command.CommandSession;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openengsb.labs.paxexam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.TestProbeBuilder;
 import org.ops4j.pax.exam.junit.Configuration;
-import org.ops4j.pax.exam.junit.ExamReactorStrategy;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.exam.junit.ProbeBuilder;
 import org.ops4j.pax.exam.util.Filter;
@@ -88,7 +78,7 @@ public class TestThingsExist {
 				blueprint);
 		log("Found it! It includes the following components:");
 		for (Object id : blueprint.getComponentIds()) {
-			log(blueprint.getComponentMetadata((String) id).getId());
+			log((String) id);
 		}
 	}
 
@@ -107,8 +97,9 @@ public class TestThingsExist {
 		tracker.waitForService(0);
 		camel = (CamelContext) tracker.getService();
 		log("Testing for Camel context...");
+		assertNotNull("Could not find Camel context for Beverly!",
+				camel);
 		log("Found CamelContext with name: " + camel.getName());
-		assertNotNull(camel);
 		camel = null;
 		tracker.close();
 	}
@@ -126,10 +117,13 @@ public class TestThingsExist {
 		camel = (CamelContext) tracker.getService();
 		log("Testing for Camel routes...");
 		log("Found CamelContext with name: " + camel.getName());
+		// get names from routes
 		List<String> routenames = Lists.transform(camel.getRoutes(),
 				new getRouteName());
 		log("Found routes with these From URIs:");
+		// print 'em
 		log(Joiner.on("\n").skipNulls().join(routenames));
+		// are the ones we know should exist where they ought be?
 		assertTrue(routenames.containsAll(ROUTENAMES));
 		log("The right routes exist!");
 		camel = null;
@@ -138,32 +132,12 @@ public class TestThingsExist {
 
 	/*
 	 * This method returns the configuration that Pax Exam uses
-	 * to set up the test container.
+	 * to set up the test container. This is factored into the
+	 * class KarafConfig for reuse.
 	 */
 	@Configuration
 	public Option[] config() {
-		return new Option[] {
-				// here we set up the basic construction of our test container
-				karafDistributionConfiguration()
-						.frameworkUrl(
-								maven().groupId("org.apache.karaf")
-										.artifactId("apache-karaf").type("zip")
-										.versionAsInProject())
-						.karafVersion("2.2.7")
-						.unpackDirectory(new File("target/test-containers/")),
-				// junitBundles(),
-				compendiumProfile(), keepRuntimeFolder(),
-				logLevel(LogLevel.DEBUG),
-				// the tests use Guava
-				mavenBundle("com.google.guava", "guava").versionAsInProject(),
-				// and of course, ActiveMQ
-				scanFeatures(maven("org.apache.activemq", "activemq-karaf")
-						.type("xml").classifier("features"),
-						"activemq-blueprint"),
-				// and Beverly herself
-				scanFeatures(maven("edu.virginia.lib", "repository-indexing")
-						.type("xml").classifier("features"),
-						"repository-indexing") };
+		return KarafConfig.config();
 	}
 
 	/*
