@@ -348,7 +348,7 @@
   </module>
   <module role="org.fcrepo.server.resourceIndex.ResourceIndex" class="org.fcrepo.server.resourceIndex.ResourceIndexModule">
     <comment>Supports the ResourceIndex.</comment>
-    <param name="level" value="0">
+    <param name="level" value="1">
       <comment>(required) 
             Index level. Currently, only 0, and 1 are supported levels. 
             0 = off and 1 = on.
@@ -413,9 +413,9 @@
   </module>
   <module role="org.fcrepo.server.messaging.Messaging" class="org.fcrepo.server.messaging.MessagingModule">
     <comment>Fedora's Java Messaging Service (JMS) Module</comment>
-    <param name="enabled" value="false"/>
+    <param name="enabled" value="true"/>
     <param name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-    <param name="java.naming.provider.url" value="vm:(broker:(tcp://localhost:61616))"/>
+    <param name="java.naming.provider.url" value="vm:(broker:(network:static:tcp://localhost:61616)?persistent=false)"/>
     <param name="datastore1" value="apimUpdateMessages">
       <comment>A datastore representing a JMS Destination for APIM events which update the repository</comment>
     </param>

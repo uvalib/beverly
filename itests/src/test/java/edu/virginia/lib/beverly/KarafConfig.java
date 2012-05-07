@@ -7,6 +7,7 @@ import static org.ops4j.pax.exam.CoreOptions.compendiumProfile;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
+import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 
 import java.io.File;
 
@@ -27,12 +28,12 @@ public class KarafConfig {
 				// junitBundles(),
 				compendiumProfile(),
 				// just in case we want to look at debris, we should keep the
-				// container
-				// let 'mvn clean' clean up if needed.
-				keepRuntimeFolder(), //logLevel(LogLevel.DEBUG),
+				// container: let 'mvn clean' clean up if needed.
+				keepRuntimeFolder(),
+				//logLevel(LogLevel.DEBUG),
 				// the tests use Guava to simplify some collections jazz
 				mavenBundle("com.google.guava", "guava").versionAsInProject(),
-				// and of course, Beverly needs an MQ plant
+				// of course, Beverly needs an MQ plant
 				scanFeatures(maven("org.apache.activemq", "activemq-karaf")
 						.type("xml").classifier("features"),
 						"activemq-blueprint"),

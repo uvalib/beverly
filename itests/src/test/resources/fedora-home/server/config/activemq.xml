@@ -6,7 +6,7 @@
   http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd">
 
   <!-- ActiveMQ JMS Broker configuration -->
-  <amq:broker id="broker" useShutdownHook="false">
+  <amq:broker id="broker" persistent="false" useShutdownHook="false">
 
     <amq:managementContext>
       <amq:managementContext connectorPort="1093" createConnector="false"/>
@@ -18,9 +18,9 @@
     </amq:networkConnectors>
 
     <!-- The directory where Fedora will store the ActiveMQ data -->
-    <amq:persistenceAdapter>
+    <!--<amq:persistenceAdapter>
       <amq:amqPersistenceAdapter directory="file:./data/amq"/>
-    </amq:persistenceAdapter>
+    </amq:persistenceAdapter>-->
   </amq:broker>
 
   <!-- Set this to prevent objects from being serialized when

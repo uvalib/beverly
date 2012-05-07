@@ -15,6 +15,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<pax.exam.version>2.3.1</pax.exam.version>
 		<fedora.home>${project.build.directory}/fedora-home</fedora.home>
+		<fedora.objectStore>${fedora.home}/data/objectStore</fedora.objectStore>
+		<fedora.datastreamStore>${fedora.home}/data/datastreamStore</fedora.datastreamStore>
 		<javax.net.ssl.trustStore>${fedora.home}/server/truststore</javax.net.ssl.trustStore>
 		<javax.net.ssl.trustStorePassword>tomcat</javax.net.ssl.trustStorePassword>
 		<fedora.appServerContext>fedora</fedora.appServerContext>
@@ -26,12 +28,12 @@
 			<!-- copy Fedora home to be used by integration tests -->
 			<testResource>
 				<directory>${basedir}/src/test/resources/fedora-home</directory>
-				<targetPath>${project.build.directory}/fedora-home</targetPath>
+				<targetPath>${fedora.home}</targetPath>
 			</testResource>
 			<!-- ditto for Solr -->
 			<testResource>
 				<directory>${basedir}/src/test/resources/solr-home</directory>
-				<targetPath>${project.build.directory}/solr-home</targetPath>
+				<targetPath>${solr.home}</targetPath>
 			</testResource>
 		</testResources>
 		<plugins>
@@ -94,6 +96,8 @@
 						<systemProperties>
 							<!-- Here's where we hook Fedora up with a Fedora-home -->
 							<fedora.home>${fedora.home}</fedora.home>
+							<fedora.objectStore>${fedora.objectStore}</fedora.objectStore>
+							<fedora.datastreamStore>${fedora.datastreamStore}</fedora.datastreamStore>
 							<javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
 							<javax.net.ssl.trustStorePassword>${javax.net.ssl.trustStorePassword}</javax.net.ssl.trustStorePassword>
 							<!-- Here's where we hook Solr up with a Solr-home -->
@@ -105,7 +109,7 @@
 					<!-- starting container prior to integration tests -->
 					<execution>
 						<id>start-container</id>
-						<phase>pre-integration-test</phase>
+						<phase>test-compile</phase>
 						<goals>
 							<goal>start</goal>
 						</goals>
@@ -113,27 +117,14 @@
 					<!-- stopping container after integration tests -->
 					<execution>
 						<id>stop-container</id>
-						<phase>post-integration-test</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>stop</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
-			<!-- no reason to run unit tests -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>integration-test</phase>
-						<goals>
-							<goal>test</goal>
-						</goals>
-					</execution>
-				</executions>
-				<version>2.12</version>
-			</plugin>
+
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -161,6 +152,27 @@
 											<goal>
 												generate-depends-file
 											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute>
+											<runOnIncremental>false</runOnIncremental>
+										</execute>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.cargo
+										</groupId>
+										<artifactId>
+											cargo-maven2-plugin
+										</artifactId>
+										<versionRange>
+											[1.2.1,)
+										</versionRange>
+										<goals>
+											<goal>start</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
@@ -233,12 +245,6 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>0.11.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-client</artifactId>
-			<version>3.5</version>
-			<type>pom</type>
 		</dependency>
 	</dependencies>
 
