@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
 
 @RunWith(JUnit4TestRunner.class)
 //@ExamReactorStrategy(EagerSingleStagedReactorFactory.class)
-public class TestThingsExist {
+public class TestThatBeverlyExists {
 
 	// TO DO add the other route names here
 	private final List<String> ROUTENAMES = Arrays.asList(

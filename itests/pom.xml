@@ -17,10 +17,6 @@
 		<fedora.home>${project.build.directory}/fedora-home</fedora.home>
 		<javax.net.ssl.trustStore>${fedora.home}/server/truststore</javax.net.ssl.trustStore>
 		<javax.net.ssl.trustStorePassword>tomcat</javax.net.ssl.trustStorePassword>
-		<fedora.username>fedoraAdmin</fedora.username>
-		<fedora.password>fedoraAdmin</fedora.password>
-		<fedora.hostname>localhost</fedora.hostname>
-		<fedora.port>8080</fedora.port>
 		<fedora.appServerContext>fedora</fedora.appServerContext>
 		<solr.home>${project.build.directory}/solr-home</solr.home>
 	</properties>
@@ -232,6 +228,17 @@
 			<groupId>org.apache.solr</groupId>
 			<type>war</type>
 			<version>3.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>0.11.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.fcrepo</groupId>
+			<artifactId>fcrepo-client</artifactId>
+			<version>3.5</version>
+			<type>pom</type>
 		</dependency>
 	</dependencies>
 
