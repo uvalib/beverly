@@ -7,7 +7,7 @@
   </author>
   <title type="text">purgeRelationship</title>
   <category term="${headers.subject}" scheme="fedora-types:subject" label="xsd:string"/>
-  <category term="http://fedora.lib.virginia.edu/relationships#isIndexedBy" scheme="fedora-types:relationship" label="xsd:string"/>
+  <category term="${headers.indexerPredicate"" scheme="fedora-types:relationship" label="xsd:string"/>
   <category term="info:fedora/${headers.pid}/XSLT" scheme="fedora-types:object" label="xsd:string"/>
   <category term="false" scheme="fedora-types:isLiteral" label="xsd:boolean"/>
  

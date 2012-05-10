@@ -49,6 +49,11 @@
                     <td>The PID of the Fedora content model object that marks an object as being an indexer object.</td>
                 </tr>
                 <tr>
+                    <td>indexer-predicate</td>
+                    <td>http://fedora.lib.virginia.edu/relationships#isIndexedBy</td>
+                    <td>The predicate (URI) that is used to relate a metadata datastream to the XSLT datastream that transforms it into a solr XML record.</td>
+                </tr>
+                <tr>
                     <td>indexable-sdef</td>
                     <td>indexable:sdef</td>
                     <td>The PID of the Fedora service definition object that supports the getIndexMetadata behavior.</td>
