@@ -1,10 +1,8 @@
 type=triples&format=RDF/XML&lang=sparql&query=
 
-PREFIX uva-lib: <http://fedora.lib.virginia.edu/relationships#>
-
-construct { ?datastream <uva-lib:isIndexedBy> ?xslt . }
+construct { ?datastream <${headers.indexerPredicate}> ?xslt . }
 WHERE
 {
   <info:fedora/${headers.pid}> <fedora-view:disseminates> ?datastream .
-  ?datastream <uva-lib:isIndexedBy>  ?xslt .
+    ?datastream <${headers.indexerPredicate}>  ?xslt .
 }  
