@@ -11,14 +11,14 @@ import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.ProbeBuilder;
 import org.osgi.framework.Constants;
 
+
 public class GenericTest {
 
 	@Inject
 	CommandProcessor cp;
-
+	
 	/*
 	 * tracks whether the broker has already been started. We might use a JUnit
-	 * 
 	 * @BeforeClass to do this, but Pax Exam doesn't yet support that:
 	 * http://team.ops4j.org/browse/PAXEXAM-288
 	 */
@@ -34,13 +34,6 @@ public class GenericTest {
 		}
 		brokerStarted = true;
 	}
-
-	@ProbeBuilder
-	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
-		probe.setHeader(Constants.DYNAMICIMPORT_PACKAGE,
-				"*,org.apache.felix.service.*;status=provisional");
-		return probe;
-	}
 	
 	/*
 	 * This method returns the configuration that Pax Exam uses to set up the
@@ -49,6 +42,13 @@ public class GenericTest {
 	@Configuration
 	public Option[] config() {
 		return KarafConfig.config();
+	}
+
+	@ProbeBuilder
+	public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
+		probe.setHeader(Constants.DYNAMICIMPORT_PACKAGE,
+				"*,org.apache.felix.service.*;status=provisional");
+		return probe;
 	}
 
 	protected void log(String msg) {

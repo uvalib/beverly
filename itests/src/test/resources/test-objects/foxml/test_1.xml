@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="test:1" xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Test object 1"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="tracksysProd"/>
+  </foxml:objectProperties>
+
+  <foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Record" MIMETYPE="text/xml"
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+          xmlns:dc="http://purl.org/dc/elements/1.1/"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:title>Untitled</dc:title>
+          <dc:subject>Photography</dc:subject>
+          <dc:subject>Portraits</dc:subject>
+          <dc:subject>Holsinger Studio (Charlottesville, Va.)</dc:subject>
+          <dc:description>(Mary L. Holsinger? Ethel Holsinger?)</dc:description>
+          <dc:contributor>Holsinger, Rufus W., 1866-1930</dc:contributor>
+          <dc:type>Collection</dc:type>
+          <dc:type>StillImage</dc:type>
+          <dc:type>Photographs</dc:type>
+          <dc:format>Glass negatives</dc:format>
+          <dc:format>image/jpeg</dc:format>
+          <dc:identifier>U00103A</dc:identifier>
+          <dc:identifier>test:1</dc:identifier>
+          <dc:identifier>000007690_0002.tif</dc:identifier>
+          <dc:rights>This image may be reproduced
+						without additional permission but must be credited © Rector and Visitors of the University of Virginia</dc:rights>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="descMetadata" STATE="A" CONTROL_GROUP="M" VERSIONABLE="true">
+
+    <foxml:datastreamVersion ID="descMetadata.0" LABEL="MODS descriptive metadata"
+      MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-3.xsd"
+          version="3.3">
+          <titleInfo>
+            <title>Untitled</title>
+          </titleInfo>
+          <name type="personal" authority="lcnaf">
+            <namePart type="given">Rufus W.</namePart>
+            <namePart type="family">Holsinger</namePart>
+            <namePart type="date">1866-1930</namePart>
+            <role>
+              <roleTerm type="code" authority="marcrelator">pht</roleTerm>
+            </role>
+          </name>
+          <typeOfResource collection="yes">still image</typeOfResource>
+          <genre>Photographs</genre>
+          <originInfo>
+            <dateCreated keyDate="yes">Unknown Date</dateCreated>
+          </originInfo>
+          <physicalDescription>
+            <form authority="tgm">Glass negatives</form>
+            <internetMediaType>image/jpeg</internetMediaType>
+            <digitalOrigin>reformatted digital</digitalOrigin>
+            <note displayLabel="size inches">5x7</note>
+            <note displayLabel="condition">slight emulsion damage along right hand side</note>
+          </physicalDescription>
+          <note displayLabel="staff">(Mary L. Holsinger? Ethel Holsinger?)</note>
+          <subject authority="lcsh">
+            <topic>Photography</topic>
+          </subject>
+          <subject authority="lcsh">
+            <topic>Portraits</topic>
+          </subject>
+          <subject authority="lcsh">
+            <name type="corporate" authority="lcnaf">
+              <namePart>Holsinger Studio (Charlottesville, Va.)</namePart>
+            </name>
+          </subject>
+          <relatedItem type="series" displayLabel="Part of">
+            <titleInfo>
+              <nonSort>The</nonSort>
+              <title>Holsinger Studio Collection</title>
+            </titleInfo>
+            <name type="personal" authority="lcnaf">
+              <namePart type="given">Rufus W.</namePart>
+              <namePart type="family">Holsinger</namePart>
+              <namePart type="date">1866-1930</namePart>
+            </name>
+            <originInfo>
+              <dateCreated encoding="w3cdtf" point="start">1889</dateCreated>
+              <dateCreated encoding="w3cdtf" point="end">1939</dateCreated>
+              <place>
+                <placeTerm type="text">Charlottesville (Va.)</placeTerm>
+              </place>
+            </originInfo>
+          </relatedItem>
+          <identifier type="legacy" displayLabel="Negative Number">U00103A</identifier>
+          <identifier type="pid" displayLabel="Fedora Repository PID">test:1</identifier>
+          <identifier type="legacy" displayLabel="Special Collections legacy database record number" invalid="yes">36839</identifier>
+          <identifier type="uri" displayLabel="Accessible index record displayed in VIRGO">uva-lib:1039246</identifier>
+          <identifier type="local" displayLabel="Digitization Services Tracksys Unit ID">7690</identifier>
+          <identifier type="local" displayLabel="Digitization Services Tracksys MasterFile ID">365504</identifier>
+          <identifier type="local" displayLabel="Digitization Services Archive Filename">000007690_0002.tif</identifier>
+          <location>
+            <url/>
+          </location>
+          <location>
+            <physicalLocation>Special Collections, University of Virginia Library, Charlottesville, Va.</physicalLocation>
+          </location>
+          <location>
+            <physicalLocation authority="oclcorg">VA@</physicalLocation>
+          </location>
+          <accessCondition type="restrictionOnAccess" displayLabel="Access to the Collection"/>
+          <accessCondition type="useAndReproduction" displayLabel="Use of the Collection">This image
+            may be reproduced without additional permission but must be credited © Rector and
+            Visitors of the University of Virginia</accessCondition>
+          <recordInfo>
+            <recordContentSource>University of Virginia Library</recordContentSource>
+            <recordCreationDate encoding="iso8601">2007-08-03T13:48:39</recordCreationDate>
+            <recordChangeDate encoding="iso8601">2009-07-23T10:35:57.04-04:00</recordChangeDate>
+            <recordOrigin>University of Virginia Library</recordOrigin>
+            <languageOfCataloging>
+              <languageTerm type="code" authority="iso639-2b">eng</languageTerm>
+            </languageOfCataloging>
+          </recordInfo>
+        </mods>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="RELS-INT" STATE="A" CONTROL_GROUP="M" VERSIONABLE="true">
+
+    <foxml:datastreamVersion ID="RELS-INT.0" LABEL="Datastream Relationships"
+      MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+          xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+          xmlns:uva="http://fedora.lib.virginia.edu/relationships#">
+          <rdf:Description rdf:about="info:fedora/test:1/descMetadata">
+            <uva:isIndexedBy rdf:resource="info:fedora/indexer:mods/XSLT"/>
+          </rdf:Description>
+          <rdf:Description rdf:about="info:fedora/test:1/technicalMetadata">
+            <uva:isIndexedBy rdf:resource="info:fedora/indexer:mix/XSLT"/>
+          </rdf:Description>
+        </rdf:RDF>
+
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="technicalMetadata" STATE="A" CONTROL_GROUP="M" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="technicalMetadata.0" LABEL="Technical metadata" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <mix:mix
+          xsi:schemaLocation="http://www.loc.gov/mix/v20 http://www.loc.gov/standards/mix/mix20/mix20.xsd"
+          xmlns:mix="http://www.loc.gov/mix/v20"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <mix:BasicDigitalObjectInformation>
+            <mix:ObjectIdentifier>
+              <mix:objectIdentifierType>filename</mix:objectIdentifierType>
+              <mix:objectIdentifierValue>000007690_0002.tif</mix:objectIdentifierValue>
+            </mix:ObjectIdentifier>
+            <mix:ObjectIdentifier>
+              <mix:objectIdentifierType>pid</mix:objectIdentifierType>
+              <mix:objectIdentifierValue>test:1</mix:objectIdentifierValue>
+            </mix:ObjectIdentifier>
+            <mix:fileSize>11620984</mix:fileSize>
+            <mix:FormatDesignation>
+              <mix:formatName>image/tiff</mix:formatName>
+            </mix:FormatDesignation>
+            <mix:Compression>
+              <mix:compressionScheme>Uncompressed</mix:compressionScheme>
+            </mix:Compression>
+          </mix:BasicDigitalObjectInformation>
+          <mix:BasicImageInformation>
+            <mix:BasicImageCharacteristics>
+              <mix:imageWidth>2902</mix:imageWidth>
+              <mix:imageHeight>3994</mix:imageHeight>
+              <mix:PhotometricInterpretation>
+                <mix:colorSpace>RGB</mix:colorSpace>
+              </mix:PhotometricInterpretation>
+            </mix:BasicImageCharacteristics>
+          </mix:BasicImageInformation>
+          <mix:ImageAssessmentMetadata>
+            <mix:SpatialMetrics>
+              <mix:samplingFrequencyUnit>in.</mix:samplingFrequencyUnit>
+              <mix:xSamplingFrequency>
+                <mix:numerator>600</mix:numerator>
+              </mix:xSamplingFrequency>
+              <mix:ySamplingFrequency>
+                <mix:numerator>600</mix:numerator>
+              </mix:ySamplingFrequency>
+            </mix:SpatialMetrics>
+            <mix:ImageColorEncoding>
+              <mix:BitsPerSample>
+                <mix:bitsPerSampleValue>8</mix:bitsPerSampleValue>
+                <mix:bitsPerSampleUnit>integer</mix:bitsPerSampleUnit>
+              </mix:BitsPerSample>
+              <mix:samplesPerPixel>1</mix:samplesPerPixel>
+            </mix:ImageColorEncoding>
+          </mix:ImageAssessmentMetadata>
+        </mix:mix>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="RELS-EXT" STATE="A" CONTROL_GROUP="M" VERSIONABLE="true">
+
+    <foxml:datastreamVersion ID="RELS-EXT.0" LABEL="Object Relationships"
+      MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <rdf:Description rdf:about="info:fedora/test:1">
+            <hasCatalogRecordIn xmlns="http://fedora.lib.virginia.edu/relationships#"
+              rdf:resource="info:fedora/uva-lib:744806"/>
+            <hasPreceedingPage xmlns="http://fedora.lib.virginia.edu/relationships#"
+              rdf:resource="info:fedora/uva-lib:1039245"/>
+            <isFollowingPageOf xmlns="http://fedora.lib.virginia.edu/relationships#"
+              rdf:resource="info:fedora/uva-lib:1039245"/>
+            <hasFollowingPage xmlns="http://fedora.lib.virginia.edu/relationships#"
+              rdf:resource="info:fedora/uva-lib:1039247"/>
+            <isPreceedingPageOf xmlns="http://fedora.lib.virginia.edu/relationships#"
+              rdf:resource="info:fedora/uva-lib:1039247"/>
+            <hasModel xmlns="info:fedora/fedora-system:def/model#"
+              rdf:resource="info:fedora/indexable:cm"/> 
+          </rdf:Description>
+
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+
+</foxml:digitalObject>

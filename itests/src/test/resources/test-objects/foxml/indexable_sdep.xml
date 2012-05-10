@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="indexable:sdep"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="SDep for indexing"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE=""/>
+  </foxml:objectProperties>
+  <foxml:datastream ID="RELS-EXT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="RELS-EXT1.0" LABEL="RDF Statements about this object"
+      MIMETYPE="application/rdf+xml" FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <rdf:Description rdf:about="info:fedora/indexable:sdep">
+            <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ServiceDeployment-3.0"/>
+            <fedora-model:isDeploymentOf rdf:resource="info:fedora/indexable:sdef"/>
+            <fedora-model:isContractorOf rdf:resource="info:fedora/indexable:cm"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="METHODMAP" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="METHODMAP1.0" LABEL="Deployment Method Map" MIMETYPE="text/xml"
+      FORMAT_URI="info:fedora/fedora-system:FedoraSDepMethodMap-1.1">
+      <foxml:xmlContent>
+        <fmm:MethodMap xmlns:fmm="http://fedora.comm.nsdlib.org/service/methodmap" name="N/A">
+          <fmm:method operationName="getIndexingMetadata" wsdlMsgName="getIndexingMetadataRequest"
+            wsdlMsgOutput="getIndexingMetadataResponse">
+            <fmm:DefaultInputParm defaultValue="$pid" parmName="pid" passBy="VALUE" required="TRUE"/>
+            <fmm:DatastreamInputParm parmName="DC" passBy="URL_REF" required="true"/>
+            <fmm:MethodReturnType wsdlMsgName="getIndexingMetadataResponse" wsdlMsgTOMIME="N/A"/>
+          </fmm:method>
+        </fmm:MethodMap>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="DSINPUTSPEC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="DSINPUTSPEC1.0" LABEL="Datastream Input Specification"
+      MIMETYPE="text/xml" FORMAT_URI="info:fedora/fedora-system:FedoraDSInputSpec-1.1">
+      <foxml:xmlContent>
+        <fbs:DSInputSpec xmlns:fbs="http://fedora.comm.nsdlib.org/service/bindspec" label="N/A">
+          <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" wsdlMsgPartName="DC">
+            <fbs:DSInputLabel>DC</fbs:DSInputLabel>
+            <fbs:DSMIME>text/xml</fbs:DSMIME>
+            <fbs:DSInputInstruction>N/A</fbs:DSInputInstruction>
+          </fbs:DSInput>
+        </fbs:DSInputSpec>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="WSDL" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="WSDL1.0" LABEL="WSDL Bindings" MIMETYPE="text/xml"
+      FORMAT_URI="http://schemas.xmlsoap.org/wsdl/">
+      <foxml:xmlContent>
+        <wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+          xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+          xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap"
+          xmlns:soapenc="http://schemas.xmlsoap.org/wsdl/soap/encoding"
+          xmlns:this="urn:thisNamespace" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+          xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="N/A"
+          targetNamespace="urn:thisNamespace">
+          <wsdl:types>
+            <xsd:schema targetNamespace="urn:thisNamespace">
+              <xsd:simpleType name="pidType">
+                <xsd:restriction base="xsd:string"/>
+              </xsd:simpleType>
+            </xsd:schema>
+          </wsdl:types>
+          <wsdl:message name="getIndexingMetadataRequest">
+            <wsdl:part name="pid" type="this:pidType"/>
+          </wsdl:message>
+          <wsdl:message name="getIndexingMetadataResponse">
+            <wsdl:part name="response" type="xsd:element"/>
+          </wsdl:message>
+          <wsdl:portType name="portType">
+            <wsdl:operation name="getIndexingMetadata">
+              <wsdl:input message="this:getIndexingMetadataRequest"/>
+              <wsdl:output message="this:getIndexingMetadataResponse"/>
+            </wsdl:operation>
+          </wsdl:portType>
+          <wsdl:service name="N/A">
+            <wsdl:port binding="this:binding" name="port">
+              <http:address location="LOCAL"/>
+            </wsdl:port>
+          </wsdl:service>
+          <wsdl:binding name="binding" type="this:portType">
+            <http:binding verb="GET"/>
+            <wsdl:operation name="getIndexingMetadata">
+              <http:operation
+                location="http://localhost:8193/getIndexingMetadata?pid=(pid)&amp;repositoryURL=http://localhost:8080/fedora"/>
+              <wsdl:input>
+                <http:urlReplacement/>
+              </wsdl:input>
+              <wsdl:output>
+                <mime:content type="N/A"/>
+              </wsdl:output>
+            </wsdl:operation>
+          </wsdl:binding>
+        </wsdl:definitions>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Record for this object"
+      MIMETYPE="text/xml" FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+          xmlns:dc="http://purl.org/dc/elements/1.1/"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:title>SDep for indexing</dc:title>
+          <dc:identifier>indexable:sdep</dc:identifier>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

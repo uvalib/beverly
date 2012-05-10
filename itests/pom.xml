@@ -35,10 +35,15 @@
 				<directory>${basedir}/src/test/resources/solr-home</directory>
 				<targetPath>${solr.home}</targetPath>
 			</testResource>
+			<!-- and test object FOXML -->
+			<testResource>
+				<directory>${basedir}/src/test/resources/test-objects</directory>
+			</testResource>
 		</testResources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.4</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -109,7 +114,7 @@
 					<!-- starting container prior to integration tests -->
 					<execution>
 						<id>start-container</id>
-						<phase>test-compile</phase>
+						<phase>pre-integration-test</phase>
 						<goals>
 							<goal>start</goal>
 						</goals>
@@ -117,9 +122,26 @@
 					<!-- stopping container after integration tests -->
 					<execution>
 						<id>stop-container</id>
-						<phase>prepare-package</phase>
+						<phase>post-integration-test</phase>
 						<goals>
 							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<includes>
+						<include>**/ITest*.java</include>
+					</includes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
 						</goals>
 					</execution>
 				</executions>

@@ -15,8 +15,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.junit.ExamReactorStrategy;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.exam.util.Filter;
+import org.ops4j.pax.exam.spi.reactors.EagerSingleStagedReactorFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.blueprint.container.BlueprintContainer;
@@ -27,48 +29,27 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 @RunWith(JUnit4TestRunner.class)
-// @ExamReactorStrategy(EagerSingleStagedReactorFactory.class)
-public class TestThatBeverlyExists extends GenericTest {
+@ExamReactorStrategy(EagerSingleStagedReactorFactory.class)
+public class ITestThatBeverlyExists extends GenericTest {
 
 	// TO DO add the other route names here
 	private final List<String> ROUTENAMES = Arrays.asList(
 			"seda://service:indexing:index",
 			"direct://service:indexing:indexIndexableObject");
 
-	@Inject
-	private BundleContext context;
+	private CamelContext camel;
 
 	@Inject
 	@Filter(value = "osgi.blueprint.container.symbolicname=edu.virginia.lib.repository-indexing", timeout = 20000)
 	BlueprintContainer blueprint;
-
+	
+	@Inject
+	private BundleContext context;
+	
+	private ServiceTracker tracker;
+	
 	@Inject
 	CommandProcessor cp;
-
-	private ServiceTracker tracker;
-	private CamelContext camel;
-
-	@Before
-	public void getCamelContext() throws InterruptedException, InvalidSyntaxException {
-		// we want to do this programmatically, not via injection
-		// because the MQ broker may not be fully started yet
-		// and we will have to wait for it by waitForService()
-		// That's very hard with injection.
-		tracker = new ServiceTracker(
-				context,
-				context.createFilter("(camel.context.name=repository-indexer)"),
-				null);
-		tracker.open();
-		tracker.waitForService(0);
-		camel = (CamelContext) tracker.getService();
-	}
-	
-	@After
-	public void releaseCamelContext() {
-		camel = null;
-		context.ungetService(tracker.getServiceReference());
-		tracker.close();
-	}
 
 	@Test
 	public void testBlueprintContainerExists() throws Exception {
@@ -103,6 +84,28 @@ public class TestThatBeverlyExists extends GenericTest {
 		// are the ones we know should exist where they ought be?
 		assertTrue(routenames.containsAll(ROUTENAMES));
 		log("The right routes exist!");
+	}
+	
+	@Before
+	public void getCamelContext() throws InterruptedException, InvalidSyntaxException {
+		// we want to do this programmatically, not via injection
+		// because the MQ broker may not be fully started yet
+		// and we will have to wait for it by waitForService()
+		// That's very hard with injection.
+		tracker = new ServiceTracker(
+				context,
+				context.createFilter("(camel.context.name=repository-indexer)"),
+				null);
+		tracker.open();
+		tracker.waitForService(0);
+		camel = (CamelContext) tracker.getService();
+	}
+	
+	@After
+	public void releaseCamelContext() {
+		camel = null;
+		context.ungetService(tracker.getServiceReference());
+		tracker.close();
 	}
 
 	private class getRouteName implements Function<Route, String> {

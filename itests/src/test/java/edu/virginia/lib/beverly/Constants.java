@@ -2,7 +2,7 @@ package edu.virginia.lib.beverly;
 
 public class Constants {
 
-	final private static String repo1Url = "http://localhost:8080/fedora";
+	final protected static String repo1Url = "http://localhost:8080/fedora";
 	final protected static String indexSDef = "indexable:sdef";
 	final protected static String indexMethod = "getIndexingMetadata";
 	

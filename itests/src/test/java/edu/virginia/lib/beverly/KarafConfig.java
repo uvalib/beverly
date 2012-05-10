@@ -3,11 +3,7 @@ package edu.virginia.lib.beverly;
 import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.logLevel;
-import static org.ops4j.pax.exam.CoreOptions.compendiumProfile;
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
-import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
+import static org.ops4j.pax.exam.CoreOptions.*;
 
 import java.io.File;
 
@@ -30,7 +26,7 @@ public class KarafConfig {
 				// just in case we want to look at debris, we should keep the
 				// container: let 'mvn clean' clean up if needed.
 				keepRuntimeFolder(),
-				//logLevel(LogLevel.DEBUG),
+				logLevel(LogLevel.DEBUG),
 				// the tests use Guava to simplify some collections jazz
 				mavenBundle("com.google.guava", "guava").versionAsInProject(),
 				// of course, Beverly needs an MQ plant
