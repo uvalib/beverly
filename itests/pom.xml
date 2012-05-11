@@ -68,6 +68,12 @@
 				<version>1.2.1</version>
 				<configuration>
 					<configuration>
+						<configfiles>
+							<configfile>
+								<file>${project.basedir}/src/test/resources/container-config/server.xml</file>
+								<todir>conf</todir>
+							</configfile>
+						</configfiles>
 						<deployables>
 							<deployable>
 								<artifactId>fcrepo-webapp-fedora</artifactId>

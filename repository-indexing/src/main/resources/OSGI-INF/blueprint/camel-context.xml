@@ -1,367 +1,397 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
-  xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+    xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
   http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0 http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0
   http://camel.apache.org/schema/blueprint https://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
 
-  <!-- OSGI blueprint property placeholder -->
-  <cm:property-placeholder id="blueprint.placeholder" persistent-id="edu.virginia.lib.beverly">
-    <cm:default-properties>
-      <cm:property name="indexable-cm" value="indexable:cm"/>
-      <cm:property name="indexer-predicate" value="http://fedora.lib.virginia.edu/relationships#isIndexedBy" />
-      <cm:property name="indexable-sdef" value="indexable:sdef"/>
-      <cm:property name="solr-update-url" value="http://localhost:8080/solr/update" />
-      <cm:property name="getIndexingMetadata-port" value="8193"/>
-      <cm:property name="indexer-cm" value="indexer:cm"/>
-      <cm:property name="solr-datastream" value="SOLR"/>
-      <cm:property name="fedora-api-m-queue-name" value="fedora.apim.update"/>
-      <cm:property name="fedoraPassword" value="fedoraAdmin"/>
-      <cm:property name="fedoraUsername" value="fedoraAdmin"/>
-      <cm:property name="solr-http-timeout" value="60000"/>
-      <cm:property name="xmlTypes" value="text/xml,application/xml,application/xhtml+xml,application/rdf+xml"/>
-    </cm:default-properties>
-  </cm:property-placeholder>
+    <!-- OSGI blueprint property placeholder -->
+    <cm:property-placeholder id="blueprint.placeholder" persistent-id="edu.virginia.lib.beverly">
+        <cm:default-properties>
+            <cm:property name="indexable-cm" value="indexable:cm"/>
+            <cm:property name="indexer-predicate"
+                value="http://fedora.lib.virginia.edu/relationships#isIndexedBy"/>
+            <cm:property name="indexable-sdef" value="indexable:sdef"/>
+            <cm:property name="solr-update-url" value="http://localhost:8080/solr/update"/>
+            <cm:property name="getIndexingMetadata-port" value="8193"/>
+            <cm:property name="indexer-cm" value="indexer:cm"/>
+            <cm:property name="solr-datastream" value="SOLR"/>
+            <cm:property name="fedora-api-m-queue-name" value="fedora.apim.update"/>
+            <cm:property name="fedoraPassword" value="fedoraAdmin"/>
+            <cm:property name="fedoraUsername" value="fedoraAdmin"/>
+            <cm:property name="solr-http-timeout" value="60000"/>
+            <cm:property name="xmlTypes"
+                value="text/xml,application/xml,application/xhtml+xml,application/rdf+xml"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
 
-  <camelContext id="repository-indexer" xmlns="http://camel.apache.org/schema/blueprint"
-    streamCache="true" trace="false" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    xmlns:atom="http://www.w3.org/2005/Atom"
-    xmlns:fedora-model="info:fedora/fedora-system:def/model#"
-    xmlns:fedora-management="http://www.fedora.info/definitions/1/0/management/"
-    xmlns:fedora-types="http://www.fedora.info/definitions/1/0/types/">
+    <camelContext id="repository-indexer" xmlns="http://camel.apache.org/schema/blueprint"
+        streamCache="true" trace="false" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:atom="http://www.w3.org/2005/Atom"
+        xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+        xmlns:fedora-management="http://www.fedora.info/definitions/1/0/management/"
+        xmlns:fedora-types="http://www.fedora.info/definitions/1/0/types/">
 
-    <propertyPlaceholder id="properties" location="blueprint:blueprint.placeholder"/>
+        <propertyPlaceholder id="properties" location="blueprint:blueprint.placeholder" prefixToken="{{" suffixToken="}}"/>
 
-    <jmxAgent id="agent" disabled="true"/>
+        <jmxAgent id="agent" disabled="true"/>
 
-    <threadPoolProfile id="defaultThreadPoolProfile" defaultProfile="true" poolSize="8"
-      maxPoolSize="12" maxQueueSize="10000" rejectedPolicy="CallerRuns"/>
+        <threadPoolProfile id="defaultThreadPoolProfile" defaultProfile="true" poolSize="8"
+            maxPoolSize="12" maxQueueSize="10000" rejectedPolicy="CallerRuns"/>
 
-    <route>
-      <description>Entry point for all indexing workflows</description>
-      <from uri="seda:service:indexing:index"/>
+        <route>
+            <description>Entry point for all indexing workflows</description>
+            <from uri="seda:service:indexing:index"/>
 
-      <choice>
-        <when>
-          <description>Is this a purgeObject operation?</description>
-          <simple>${header.methodName} == 'purgeObject'</simple>
-          <!-- fire a Solr delete operation at the index, in case it was an indexable object -->
-          <to uri="freemarker:freemarker/solr/delete.vm"/>
-          <setHeader headerName="Content-Type">
-            <constant>text/xml</constant>
-          </setHeader>
-          <setHeader headerName="CamelHttpMethod">
-            <constant>POST</constant>
-          </setHeader>
-          <to uri="{{solr-update-url}}" />
-          <removeHeader headerName="CamelHttpMethod"/>
-          <!-- but also assume that it might have been an indexer object -->
-          <!-- first gather the affected objects -->
-          <to uri="freemarker:freemarker/sparql/getindexedobjects.vm"/>
-          <inOut uri="seda:service:repositories:resource-index"/>
-          <!-- remove the appropriate no-longer-relevant RELS-INT triples -->
-          <split parallelProcessing="true">
-            <xpath>/rdf:RDF/rdf:Description</xpath>
-            <removeHeader headerName="methodName"/>
-            <!-- remove the appropriate no-longer-relevant RELS-INT triple -->
-            <setHeader headerName="subject">
-              <!-- peel out the indexable subject -->
-              <xpath resultType="java.lang.String">/rdf:Description/@rdf:about</xpath>
-            </setHeader>
-            <setHeader headerName="indexerPredicate">
-              <xpath resultType="java.lang.String">function:properties('indexer-predicate')</xpath>
-            </setHeader>
-            <to uri="freemarker:freemarker/atom/removetriples.vm"/>
-            <removeHeader headerName="subject"/>
-            <removeHeader headerName="indexerPredicate" />
-            <to uri="seda:service:repositories:api-m"/>
-            <!-- don't need to explicitly reindex the object because we just
-              called purgeRelationship on it, which will trigger reindexing-->
-          </split>
-        </when>
-        <otherwise>
-          <description>This object was not purged, so we can retrieve info about it from its
-          repo</description>
-
-          <!-- is this a content object or an indexer object? -->
-
-          <to uri="freemarker:freemarker/sparql/getcontentmodels.vm"/>
-          <inOut uri="seda:service:repositories:resource-index"/>
-          <log
-            message="Retrieved content model information: in.body = ${in.body} and out.body = ${out.body}"/>
-          <log
-            message="Checking for indexable content model: {{indexable-cm}} or indexer content model: {{indexer-cm}}"/>
-          <choice>
-            <when>
-              <description>Does this object have the indexable CM?</description>
-              <xpath>/rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',function:properties('indexable-cm'))</xpath>
-              <choice>
+            <choice>
                 <when>
-                  <description>Is this a purgeDatastream operation?</description>
-                  <simple>${header.methodName} == 'purgeDatastream'</simple>
-                  <!-- first remove any dependent RELS-INT triples -->
-                  <to uri="freemarker:freemarker/sparql/getindexedpurgeddatastreams.vm"/>
-                  <!-- now reindex this object -->
-                  <to uri="direct:service:indexing:indexIndexableObject"/>
+                    <description>Is this a purgeObject operation?</description>
+                    <simple>${header.methodName} == 'purgeObject'</simple>
+                    <!-- fire a Solr delete operation at the index, in case it was an indexable object -->
+                    <to uri="freemarker:freemarker/solr/delete.vm"/>
+                    <setHeader headerName="Content-Type">
+                        <constant>text/xml</constant>
+                    </setHeader>
+                    <setHeader headerName="CamelHttpMethod">
+                        <constant>POST</constant>
+                    </setHeader>
+                    <to uri="{{solr-update-url}}"/>
+                    <removeHeader headerName="CamelHttpMethod"/>
+                    <!-- but also assume that it might have been an indexer object -->
+                    <!-- first gather the affected objects -->
+                    <to uri="freemarker:freemarker/sparql/getindexedobjects.vm"/>
+                    <inOut uri="seda:service:repositories:resource-index"/>
+                    <!-- remove the appropriate no-longer-relevant RELS-INT triples -->
+                    <split parallelProcessing="true">
+                        <xpath>/rdf:RDF/rdf:Description</xpath>
+                        <removeHeader headerName="methodName"/>
+                        <!-- remove the appropriate no-longer-relevant RELS-INT triple -->
+                        <setHeader headerName="subject">
+                            <!-- peel out the indexable subject -->
+                            <xpath resultType="java.lang.String">/rdf:Description/@rdf:about</xpath>
+                        </setHeader>
+                        <setHeader headerName="indexerPredicate">
+                            <xpath resultType="java.lang.String">function:properties('indexer-predicate')</xpath>
+                        </setHeader>
+                        <to uri="freemarker:freemarker/atom/removetriples.vm"/>
+                        <removeHeader headerName="subject"/>
+                        <removeHeader headerName="indexerPredicate"/>
+                        <to uri="seda:service:repositories:api-m"/>
+                        <!-- don't need to explicitly reindex the object because we just
+              called purgeRelationship on it, which will trigger reindexing-->
+                    </split>
                 </when>
                 <otherwise>
-                  <to uri="direct:service:indexing:indexIndexableObject"/>
+                    <description>This object was not purged, so we can retrieve info about it from its
+          repo</description>
+
+                    <!-- is this a content object or an indexer object? -->
+
+                    <to uri="freemarker:freemarker/sparql/getcontentmodels.vm"/>
+                    <inOut uri="seda:service:repositories:resource-index"/>
+                    <log
+                        message="Retrieved content model information: in.body = ${in.body} and out.body = ${out.body}"/>
+                    <log
+                        message="Checking for indexable content model: {{indexable-cm}} or indexer content model: {{indexer-cm}}"/>
+                    <choice>
+                        <when>
+                            <description>Does this object have the indexable CM?</description>
+                            <xpath>/rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',function:properties('indexable-cm'))</xpath>
+                            <choice>
+                                <when>
+                                    <description>Is this a purgeDatastream operation?</description>
+                                    <simple>${header.methodName} == 'purgeDatastream'</simple>
+                                    <!-- first remove any dependent RELS-INT triples -->
+                                    <to
+                                        uri="freemarker:freemarker/sparql/getindexedpurgeddatastreams.vm"/>
+                                    <!-- now reindex this object -->
+                                    <to uri="direct:service:indexing:indexIndexableObject"/>
+                                </when>
+                                <otherwise>
+                                    <to uri="direct:service:indexing:indexIndexableObject"/>
+                                </otherwise>
+                            </choice>
+                        </when>
+                        <when>
+                            <description>Does this object have the indexer CM?</description>
+                            <xpath>/rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',function:properties('indexer-cm'))</xpath>
+                            <log loggingLevel="DEBUG" message="Using indexer cm: {{indexer-cm}}"/>
+                            <!-- Ordinary form to index on an indexer object -->
+                            <!-- start by getting the indexed (dependent) datastreams -->
+                            <setHeader headerName="indexerPredicate">
+                                <xpath resultType="java.lang.String">function:properties('indexer-predicate')</xpath>
+                            </setHeader>
+                            <to uri="freemarker:freemarker/sparql/getindexeddatastreams.vm"/>
+                            <removeHeader headerName="indexerPredicate"/>
+                            <inOut uri="seda:service:repositories:resource-index"/>
+                            <setHeader headerName="count">
+                                <xpath resultType="java.lang.String">count(/rdf:RDF/rdf:Description)</xpath>
+                            </setHeader>
+                            <log message="Preparing to reindex ${headers.count} datastreams..."/>
+                            <removeHeader headerName="count"/>
+                            <split stopOnException="true" parallelProcessing="true">
+                                <xpath>/rdf:RDF/rdf:Description</xpath>
+                                <setHeader headerName="pid">
+                                    <!-- peel out the pid itself -->
+                                    <xpath resultType="java.lang.String">substring-before(substring-after(/rdf:Description/@rdf:about,'/'),'/')</xpath>
+                                </setHeader>
+                                <removeHeader headerName="methodName"/>
+                                <to uri="seda:service:indexing:index"/>
+                            </split>
+                        </when>
+                    </choice>
                 </otherwise>
-              </choice>
-            </when>
-            <when>
-              <description>Does this object have the indexer CM?</description>
-              <xpath>/rdf:RDF/rdf:Description/fedora-model:hasModel/@rdf:resource = concat('info:fedora/',function:properties('indexer-cm'))</xpath>
-              <log loggingLevel="DEBUG" message="Using indexer cm: {{indexer-cm}}"/>
-              <!-- Ordinary form to index on an indexer object -->
-              <!-- start by getting the indexed (dependent) datastreams -->
-              <setHeader headerName="indexerPredicate">
-                <xpath resultType="java.lang.String">function:properties('indexer-predicate')</xpath>
-              </setHeader>
-              <to uri="freemarker:freemarker/sparql/getindexeddatastreams.vm"/>
-              <removeHeader headerName="indexerPredicate" />
-              <inOut uri="seda:service:repositories:resource-index"/>
-              <setHeader headerName="count">
-                <xpath resultType="java.lang.String">count(/rdf:RDF/rdf:Description)</xpath>
-              </setHeader>
-              <log message="Preparing to reindex ${headers.count} datastreams..." />
-              <removeHeader headerName="count" />
-              <split stopOnException="true" parallelProcessing="true">
-                <xpath>/rdf:RDF/rdf:Description</xpath>
-                <setHeader headerName="pid">
-                  <!-- peel out the pid itself -->
-                  <xpath resultType="java.lang.String">substring-before(substring-after(/rdf:Description/@rdf:about,'/'),'/')</xpath>
-                </setHeader>
-                <removeHeader headerName="methodName"/>
-                <to uri="seda:service:indexing:index"/>
-              </split>
-            </when>
-          </choice>
-        </otherwise>
-      </choice>
-    </route>
+            </choice>
+        </route>
 
-    <route>
-      <description>Index a single object</description>
-      <from uri="direct:service:indexing:indexIndexableObject"/>
-      <setHeader headerName="CamelHttpUri">
-        <simple>${headers.repositoryURL}/objects/${headers.pid}/methods/{{indexable-sdef}}/getIndexingMetadata</simple>
-      </setHeader>
-      <setHeader headerName="CamelHttpMethod">
-        <constant>GET</constant>
-      </setHeader>
-      <to uri="http://fedora/getIndexingMetadata"/>
-      <removeHeader headerName="CamelHttpUri"/>
-      <removeHeader headerName="CamelHttpMethod"/>
-      <setHeader headerName="Content-Type">
-        <constant>text/xml</constant>
-      </setHeader>
-      <setHeader headerName="CamelHttpMethod">
-        <constant>POST</constant>
-      </setHeader>
-      <to uri="{{solr-update-url}}?httpClient.connectionManagerTimeout={{solr-http-timeout}}&amp;httpClient.soTimeout={{solr-http-timeout}}"/>
-    </route>
-
-    <route>
-      <description>Construct or retrieve indexing metadata for a single object</description>
-      <from
-        uri="jetty:http://0.0.0.0:{{getIndexingMetadata-port}}/getIndexingMetadata?continuationTimeout=-1"/>
-      <removeHeader headerName="CamelHttpUri"/>
-      <removeHeader headerName="CamelHttpPath"/>
-
-      <to uri="freemarker:freemarker/atom/listdatastreams.vm"/>
-      <inOut uri="seda:service:repositories:api-a"/>
-
-      <choice>
-        <when>
-          <xpath>//datastreamDef/ID = function:properties('solr-datastream')</xpath>
-          <log message="Datastream &quot;{{solr-datastream}}&quot; found, bypassing any configured transformations." />
-          <setHeader headerName="CamelHttpUri">
-            <simple>${headers.repositoryURL}/objects/${headers.pid}/datastreams/${properties:solr-datastream}/content</simple>
-          </setHeader>
-          <setHeader headerName="Content-Type">
-            <constant>text/xml</constant>
-          </setHeader>
-          <setHeader headerName="CamelHttpMethod">
-            <constant>GET</constant>
-          </setHeader>
-          <to uri="http:fedora/objects?httpClient.soTimeout=6000"/>
-          <removeHeader headerName="CamelHttpUri"/>
-          <removeHeader headerName="CamelHttpMethod"/>
-        </when>
-        <otherwise>
-          <description>Create indexing metadata from datastreams</description>
-          <log message="No datastream &quot;{{solr-datastream}}&quot; found, will generate solr document." />
-          <setHeader headerName="indexerPredicate">
-            <xpath resultType="java.lang.String">function:properties('indexer-predicate')</xpath>
-          </setHeader>
-          <to uri="freemarker:freemarker/sparql/getindexabledatastreams.vm"/>
-          <removeHeader headerName="indexerPredicate" />
-          <inOut uri="seda:service:repositories:resource-index"/>
-          <inOut uri="xslt:xslt/concretizeURIs.xsl?transformerFactory=tFactory"/>
-          <inOut uri="xslt:xslt/splitRDFDescriptions.xsl?transformerFactory=tFactory"/>
-          <log message="Post-Split RDF descriptions: in.body = ${in.body} and out.body = ${out.body}"/>
-          <split stopOnException="true" parallelProcessing="false"
-            strategyRef="simpleXMLRecursiveMergeStrategy">
-            <xpath>/rdf:RDF/rdf:Description</xpath>
-            <!-- transform a single metadata stream against its XSLT -->
-            <log
-              message="One of the split RDF descriptions: in.body = ${in.body} and out.body = ${out.body}"/>
-
-            <!-- use this header to select the transform dynamically
-                atomtosoap.xsl below is just a dummy -->
-            <setHeader headerName="stylesheetUrl">
-              <xpath resultType="java.lang.String">/rdf:Description/*[local-name() = substring-after(function:properties('indexer-predicate'), '#')]/@rdf:resource</xpath>
-            </setHeader>
-            <log loggingLevel="DEBUG" message="Got stylesheet URL &quot;${headers.stylesheetUrl}&quot;" />
-            <setHeader headerName="contentUrl">
-              <xpath resultType="java.lang.String">/rdf:Description/@rdf:about</xpath>
-            </setHeader>
-            <setHeader headerName="libDatastream">
-              <xpath resultType="java.lang.String">substring-before(substring-after(/rdf:Description/@rdf:about,concat(in:header('repositoryURL'),'/objects/',in:header('pid'),'/datastreams/')),'/content')</xpath>
-            </setHeader>
-            <!-- replace body with datastream content -->
-            <to uri="freemarker:freemarker/atom/getDatastream.vm"/>
-            <inOut uri="seda:service:repositories:api-m"/>
-            <log message="Retrieved datastream metadata: ${in.body}"/>
-
-            <setHeader headerName="MIMEType"> 
-              <xpath resultType="java.lang.String">/fedora-types:getDatastreamResponse/datastream/MIMEType</xpath>
-            </setHeader>
-            <log message="Found MIMEType ${in.headers.MIMEType}"></log>
-            <setHeader headerName="nonXmlMIMEType">
-              <xpath resultType="java.lang.Boolean">not(contains(function:properties('xmlTypes'),in:header('MIMEType')))</xpath>  
-            </setHeader>
-            <!-- fetch the datastream -->
+        <route>
+            <description>Index a single object</description>
+            <from uri="direct:service:indexing:indexIndexableObject"/>
             <setHeader headerName="CamelHttpUri">
-              <header>contentUrl</header>
+                <simple>${headers.repositoryURL}/objects/${headers.pid}/methods/{{indexable-sdef}}/getIndexingMetadata</simple>
             </setHeader>
             <setHeader headerName="CamelHttpMethod">
-              <constant>GET</constant>
+                <constant>GET</constant>
             </setHeader>
-            <to uri="http://example.com"/>
+            <to uri="http://fedora/getIndexingMetadata"/>
             <removeHeader headerName="CamelHttpUri"/>
             <removeHeader headerName="CamelHttpMethod"/>
-
-            <when>
-              <description>If datastream is not XML, use Tika</description>
-              <header>nonXmlMIMEType</header>
-              <log message="Sending to Tika"/>
-              <inOut uri="bean:tikaParser?method=parse"/>
-            </when>
-            
-            <setHeader headerName="CamelXsltResourceUri">
-              <simple>${headers.stylesheetUrl}</simple>
+            <setHeader headerName="Content-Type">
+                <constant>text/xml</constant>
             </setHeader>
-            <log message="About to run a single-datastream transform"></log>
+            <setHeader headerName="CamelHttpMethod">
+                <constant>POST</constant>
+            </setHeader>
+            <to
+                uri="{{solr-update-url}}?httpClient.connectionManagerTimeout={{solr-http-timeout}}&amp;httpClient.soTimeout={{solr-http-timeout}}"
+            />
+        </route>
+
+        <route>
+            <description>Construct or retrieve indexing metadata for a single object</description>
+            <from
+                uri="jetty:http://0.0.0.0:{{getIndexingMetadata-port}}/getIndexingMetadata?continuationTimeout=-1"/>
+            <removeHeader headerName="CamelHttpUri"/>
+            <removeHeader headerName="CamelHttpPath"/>
+
+            <to uri="freemarker:freemarker/atom/listdatastreams.vm"/>
+            <inOut uri="seda:service:repositories:api-a"/>
+
+            <choice>
+                <when>
+                    <xpath>//datastreamDef/ID = function:properties('solr-datastream')</xpath>
+                    <log
+                        message="Datastream &quot;{{solr-datastream}}&quot; found, bypassing any configured transformations."/>
+                    <setHeader headerName="CamelHttpUri">
+                        <simple>${headers.repositoryURL}/objects/${headers.pid}/datastreams/${properties:solr-datastream}/content</simple>
+                    </setHeader>
+                    <setHeader headerName="Content-Type">
+                        <constant>text/xml</constant>
+                    </setHeader>
+                    <setHeader headerName="CamelHttpMethod">
+                        <constant>GET</constant>
+                    </setHeader>
+                    <to uri="http:fedora/objects?httpClient.soTimeout=6000"/>
+                    <removeHeader headerName="CamelHttpUri"/>
+                    <removeHeader headerName="CamelHttpMethod"/>
+                </when>
+                <otherwise>
+                    <description>Create indexing metadata from datastreams</description>
+                    <log
+                        message="No datastream &quot;{{solr-datastream}}&quot; found, will generate Solr document."/>
+                    <setHeader headerName="indexerPredicate">
+                        <xpath resultType="java.lang.String">function:properties('indexer-predicate')</xpath>
+                    </setHeader>
+                    <to uri="freemarker:freemarker/sparql/getindexabledatastreams.vm"/>
+                    <removeHeader headerName="indexerPredicate"/>
+                    <inOut uri="seda:service:repositories:resource-index"/>
+                    <inOut uri="xslt:xslt/concretizeURIs.xsl?transformerFactory=tFactory"/>
+                    <inOut uri="xslt:xslt/splitRDFDescriptions.xsl?transformerFactory=tFactory"/>
+                    <log
+                        message="Post-Split RDF descriptions: in.body = ${in.body} and out.body = ${out.body}"/>
+                    <split stopOnException="true" parallelProcessing="false"
+                        strategyRef="simpleXMLRecursiveMergeStrategy">
+                        <xpath>/rdf:RDF/rdf:Description</xpath>
+                        <!-- transform a single metadata stream against its XSLT -->
+                        <log
+                            message="One of the split RDF descriptions: in.body = ${in.body} and out.body = ${out.body}"/>
+
+                        <!-- use this header to select the transform dynamically
+                atomtosoap.xsl below is just a dummy -->
+                        <setHeader headerName="stylesheetUrl">
+                            <xpath resultType="java.lang.String">/rdf:Description/*[local-name() = substring-after(function:properties('indexer-predicate'), '#')]/@rdf:resource</xpath>
+                        </setHeader>
+                        <log loggingLevel="DEBUG"
+                            message="Got stylesheet URL &quot;${headers.stylesheetUrl}&quot;"/>
+                        <setHeader headerName="contentUrl">
+                            <xpath resultType="java.lang.String">/rdf:Description/@rdf:about</xpath>
+                        </setHeader>
+                        <setHeader headerName="libDatastream">
+                            <xpath resultType="java.lang.String">substring-before(substring-after(/rdf:Description/@rdf:about,concat(in:header('repositoryURL'),'/objects/',in:header('pid'),'/datastreams/')),'/content')</xpath>
+                        </setHeader>
+                        <!-- replace body with datastream content -->
+                        <to uri="freemarker:freemarker/atom/getDatastream.vm"/>
+                        <inOut uri="seda:service:repositories:api-m"/>
+                        <log message="Retrieved datastream metadata: ${in.body}"/>
+
+                        <setHeader headerName="MIMEType">
+                            <xpath resultType="java.lang.String">/fedora-types:getDatastreamResponse/datastream/MIMEType</xpath>
+                        </setHeader>
+                        <log message="Found MIMEType ${in.headers.MIMEType}"/>
+                        <setHeader headerName="nonXmlMIMEType">
+                            <xpath resultType="java.lang.Boolean">not(contains(function:properties('xmlTypes'),in:header('MIMEType')))</xpath>
+                        </setHeader>
+                        <!-- fetch the datastream -->
+                        <setHeader headerName="CamelHttpUri">
+                            <header>contentUrl</header>
+                        </setHeader>
+                        <setHeader headerName="CamelHttpMethod">
+                            <constant>GET</constant>
+                        </setHeader>
+                        <to uri="http://example.com"/>
+                        <removeHeader headerName="CamelHttpUri"/>
+                        <removeHeader headerName="CamelHttpMethod"/>
+
+                        <when>
+                            <description>If datastream is not XML, use Tika</description>
+                            <header>nonXmlMIMEType</header>
+                            <log message="Sending to Tika"/>
+                            <inOut uri="bean:tikaParser?method=parse"/>
+                        </when>
+
+                        <setHeader headerName="CamelXsltResourceUri">
+                            <simple>${headers.stylesheetUrl}</simple>
+                        </setHeader>
+                        <log message="About to run a single-datastream transform"/>
+                        <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"/>
+                        <removeHeader headerName="CamelXsltResourceUri"/>
+                    </split>
+                    <inOut uri="xslt:xslt/mergeAndDeduplicateSolr.xsl?transformerFactory=tFactory"/>
+                </otherwise>
+            </choice>
+        </route>
+
+        <route>
+            <from uri="jms:queue:{{fedora-api-m-queue-name}}"/>
+            <setHeader headerName="repositoryURL">
+                <xpath resultType="java.lang.String">/atom:entry/atom:author/atom:uri</xpath>
+            </setHeader>
+            <to uri="seda:service:indexing:index"/>
+        </route>
+
+        <route>
+            <from uri="seda:service:repositories:api-a"/>
             <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"/>
-            <removeHeader headerName="CamelXsltResourceUri"/>
-          </split>
-          <inOut uri="xslt:xslt/mergeAndDeduplicateSolr.xsl?transformerFactory=tFactory"/>
-        </otherwise>
-      </choice>
-    </route>
- 
-    <route>
-      <from uri="jms:queue:{{fedora-api-m-queue-name}}"/>
-      <setHeader headerName="repositoryURL">
-        <xpath resultType="java.lang.String">/atom:entry/atom:author/atom:uri</xpath>
-      </setHeader>
-      <to uri="seda:service:indexing:index"/>
-    </route>
+            <setHeader headerName="CamelHttpMethod">
+                <constant>POST</constant>
+            </setHeader>
+            <!-- override with repositoryURL -->
+            <setHeader headerName="CamelHttpUri">
+                <simple>${headers.repositoryURL}/services/access</simple>
+            </setHeader>
+            <!-- Fedora, for some odd reason, requires a set SOAPAction header without using it -->
+            <setHeader headerName="SOAPAction">
+                <constant>dummy</constant>
+            </setHeader>
+            <log
+                message="Sending SOAP message to repository: in.body = ${in.body}  and out.body = ${out.body}"/>
 
-    <route>
-      <from uri="seda:service:repositories:api-a"/>
-      <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"/>
-      <setHeader headerName="CamelHttpMethod">
-        <constant>POST</constant>
-      </setHeader>
-      <!-- override with repositoryURL -->
-      <setHeader headerName="CamelHttpUri">
-        <simple>${headers.repositoryURL}/services/access</simple>
-      </setHeader>
-      <!-- Fedora, for some odd reason, requires a set SOAPAction header without using it -->
-      <setHeader headerName="SOAPAction">
-        <constant>dummy</constant>
-      </setHeader>
-      <log
-        message="Sending SOAP message to repository: in.body = ${in.body}  and out.body = ${out.body}"/>
+            <!-- default repo API-A url -->
+            <to
+                uri="http4:fedora/services/access?authMethod=Basic&amp;authUsername={{fedoraUsername}}&amp;authPassword={{fedoraPassword}}&amp;httpClient.soTimeout=6000"/>
+            <removeHeader headerName="SOAPAction"/>
+            <removeHeader headerName="CamelHttpUri"/>
+            <to uri="xslt:xslt/strip-soap.xsl?transformerFactory=tFactory"/>
+        </route>
 
-      <!-- default repo API-A url -->
-      <to
-        uri="http:fedora/services/access?authMethod=Basic&amp;authUsername={{fedoraUsername}}&amp;authPassword={{fedoraPassword}}&amp;httpClient.soTimeout=6000"/>
-      <removeHeader headerName="SOAPAction"/>
-      <removeHeader headerName="CamelHttpUri"/>
-      <to uri="xslt:xslt/strip-soap.xsl?transformerFactory=tFactory"/>
-    </route>
+        <route>
+            <from uri="seda:service:repositories:api-m"/>
+            <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"/>
+            <setHeader headerName="CamelHttpMethod">
+                <constant>POST</constant>
+            </setHeader>
+            <!-- Fedora, for some odd reason, requires a set SOAPAction header without using it -->
+            <setHeader headerName="SOAPAction">
+                <constant>dummy</constant>
+            </setHeader>
+            <!-- override with repositoryURL -->
+            <setHeader headerName="CamelHttpUri">
+                <simple>${headers.repositoryURL}/services/management?httpClient.authenticationPreemptive=true</simple>
+            </setHeader>
+            <removeHeader headerName="Host"/>
+            <!-- save a copy of the SOAP message if needed for redirect-->
+            <setHeader headerName="SOAPBody">
+                <simple>${in.body}</simple>
+            </setHeader>
+            <!-- dummy repo API-M url -->
+            <to
+                uri="http4:fedora/services/management?authMethod=Basic&amp;authUsername={{fedoraUsername}}&amp;authPassword={{fedoraPassword}}&amp;httpClient.soTimeout=6000&amp;throwExceptionOnFailure=false"/>
+            <when>
+                <!-- must we redirect? -->
+                <header>Location</header>
+                <setHeader headerName="CamelHttpUri">
+                    <simple>${headers.Location}?authMethod=Basic&amp;httpClient.authenticationPreemptive=true&amp;authUsername=${properties:fedoraUsername}&amp;authPassword=${properties:fedoraPassword}&amp;httpClient.soTimeout=6000</simple>
+                </setHeader>
+                <setBody>
+                    <header>soapBody</header>
+                </setBody>
+                <to uri="https4://dummy"/>
+                <removeHeader headerName="Location"/>
+            </when>
+            <removeHeader headerName="SOAPBody"/>
+            <removeHeader headerName="SOAPAction"/>
+            <removeHeader headerName="CamelHttpUri"/>
+            <to uri="xslt:xslt/strip-soap.xsl?transformerFactory=tFactory"/>
+        </route>
 
-    <route>
-      <from uri="seda:service:repositories:api-m"/>
-      <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"/>
-      <setHeader headerName="CamelHttpMethod">
-        <constant>POST</constant>
-      </setHeader>
-      <!-- Fedora, for some odd reason, requires a set SOAPAction header without using it -->
-      <setHeader headerName="SOAPAction">
-        <constant>dummy</constant>
-      </setHeader>
-      <!-- override with repositoryURL -->
-      <setHeader headerName="CamelHttpUri">
-        <simple>${headers.repositoryURL}/services/management?httpClient.authenticationPreemptive=true&amp;username={{fedoraUsername}}&amp;password={{fedoraPassword}}</simple>
-      </setHeader>
-      <!-- dummy repo API-M url -->
-      <to uri="http:fedora/services/management?authMethod=Basic&amp;authUsername={{fedoraUsername}}&amp;authPassword={{fedoraPassword}}&amp;httpClient.soTimeout=6000"/>
-      <removeHeader headerName="SOAPAction"/>
-      <removeHeader headerName="CamelHttpUri"/>
-      <to uri="xslt:xslt/strip-soap.xsl?transformerFactory=tFactory"/>
-    </route>
+        <!-- streamCache is set to false to prevent an exception associated with stream cache temporary files (at least in camel-core 2.9.1) -->
+        <route streamCache="false">
+            <from uri="seda:service:repositories:resource-index"/>
+            <setHeader headerName="Content-Type">
+                <constant>application/x-www-form-urlencoded</constant>
+            </setHeader>
+            <setHeader headerName="CamelHttpChunked">
+                <constant>false</constant>
+            </setHeader>
+            <setHeader headerName="CamelHttpMethod">
+                <constant>POST</constant>
+            </setHeader>
+            <!-- override endpoint address with repositoryURL -->
+            <setHeader headerName="CamelHttpUri">
+                <simple>${headers.repositoryURL}/risearch</simple>
+            </setHeader>
+            <!-- dummy repo RI search url -->
+            <to uri="http4:fedora/risearch?httpClient.soTimeout=6000"/>
+            <removeHeader headerName="Content-Type"/>
+            <removeHeader headerName="CamelHttpChunked"/>
+            <removeHeader headerName="CamelHttpUri"/>
+            <removeHeader headerName="CamelHttpMethod"/>
+        </route>
 
-    <!-- streamCache is set to false to prevent an exception associated with stream cache temporary files (at least in camel-core 2.9.1) -->
-    <route streamCache="false">
-      <from uri="seda:service:repositories:resource-index"/>
-      <setHeader headerName="Content-Type">
-        <constant>application/x-www-form-urlencoded</constant>
-      </setHeader>
-      <setHeader headerName="CamelHttpChunked">
-        <constant>false</constant>
-      </setHeader>
-      <setHeader headerName="CamelHttpMethod">
-        <constant>POST</constant>
-      </setHeader>
-      <!-- override endpoint address with repositoryURL -->
-      <setHeader headerName="CamelHttpUri">
-        <simple>${headers.repositoryURL}/risearch</simple>
-      </setHeader>
-      <!-- dummy repo RI search url -->
-      <to uri="http:fedora/risearch?httpClient.soTimeout=6000"/>
-      <removeHeader headerName="Content-Type"/>
-      <removeHeader headerName="CamelHttpChunked"/>
-      <removeHeader headerName="CamelHttpUri"/>
-      <removeHeader headerName="CamelHttpMethod"/>
-    </route>
+    </camelContext>
 
-  </camelContext>
+    <bean id="simpleXMLRecursiveMergeStrategy"
+        class="edu.virginia.lib.camel.aggregation.SimpleXMLRecursiveMergeStrategy">
+        <property name="log" ref="log"/>
+    </bean>
 
-  <bean id="simpleXMLRecursiveMergeStrategy"
-    class="edu.virginia.lib.camel.aggregation.SimpleXMLRecursiveMergeStrategy">
-    <property name="log" ref="log"/>
-  </bean>
+    <bean id="tikaParser" class="edu.virginia.lib.camel.parsing.TikaParser">
+        <property name="log" ref="log"/>
+    </bean>
 
-  <bean id="tikaParser" class="edu.virginia.lib.camel.parsing.TikaParser">
-    <property name="log" ref="log"/>
-  </bean>  
+    <bean id="tFactory" class="net.sf.saxon.TransformerFactoryImpl"/>
 
-  <bean id="tFactory" class="net.sf.saxon.TransformerFactoryImpl"/>  
+    <reference id="log" interface="org.osgi.service.log.LogService"/>
 
-  <reference id="log" interface="org.osgi.service.log.LogService"/>
+    <!-- use CF from ActiveMQ blueprint service running in container -->
+    <reference id="connectionFactory" interface="javax.jms.ConnectionFactory"/>
+    <bean id="jms" class="org.apache.camel.component.jms.JmsComponent">
+        <property name="connectionFactory" ref="connectionFactory"/>
+    </bean>
 
-  <!-- use CF from ActiveMQ blueprint service running in container -->
-  <reference id="connectionFactory" interface="javax.jms.ConnectionFactory"/>
-  <bean id="jms" class="org.apache.camel.component.jms.JmsComponent">
-    <property name="connectionFactory" ref="connectionFactory"/>
-  </bean>
+    <bean id="redirectHttpClientConfigurer" class="edu.virginia.lib.camel.http.RedirectHttpClientConfigurer"/>
+     
 
- 
 </blueprint>

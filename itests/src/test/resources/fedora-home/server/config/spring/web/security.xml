@@ -23,10 +23,6 @@
       <security:filter-chain pattern="/getDS*"
         filters="ChannelFilter" />
 
-      <!-- RISearch service gets auth protection -->
-      <security:filter-chain pattern="/risearch*"
-        filters="ChannelFilter,AuthFilterJAAS" />
-
       <!-- REST API -->
       <security:filter-chain pattern="/objects*/**"
         filters="ChannelFilter,AuthFilterJAAS" />
@@ -77,8 +73,8 @@
 
         <security:intercept-url pattern="/management/upload"
           access="${security.ssl.api.management}" />
-        <security:intercept-url pattern="/services/management"
-          access="${security.ssl.api.management}" />
+        <!--<security:intercept-url pattern="/services/management"
+          access="${security.ssl.api.management}" />-->
         <security:intercept-url pattern="/management/getNextPID"
           access="${security.ssl.api.management}" />
         <security:intercept-url pattern="/getDSAuthenticated*/**"
@@ -99,8 +95,8 @@
           access="${security.ssl.api.access}" />
         <security:intercept-url pattern="/search*"
           access="${security.ssl.api.access}" />
-        <security:intercept-url pattern="/services/access"
-          access="${security.ssl.api.access}" />
+        <!--<security:intercept-url pattern="/services/access"
+          access="${security.ssl.api.access}" />-->
         <security:intercept-url pattern="/wsdl*"
           access="${security.ssl.api.access}" />
         <security:intercept-url pattern="**.jsp"

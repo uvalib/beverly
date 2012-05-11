@@ -9,10 +9,14 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.TestProbeBuilder;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.ProbeBuilder;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
 
 public class GenericTest {
+	
+	@Inject
+	protected BundleContext context;
 
 	@Inject
 	CommandProcessor cp;

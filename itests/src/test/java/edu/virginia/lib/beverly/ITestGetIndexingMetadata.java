@@ -5,7 +5,9 @@ import static edu.virginia.lib.beverly.Constants.test1dissemination;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -13,12 +15,17 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import lombok.SneakyThrows;
+
+import org.apache.camel.CamelContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.junit.ExamReactorStrategy;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.exam.spi.reactors.EagerSingleStagedReactorFactory;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.util.tracker.ServiceTracker;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -42,7 +49,7 @@ public class ITestGetIndexingMetadata extends GenericTest {
 	 * objects and then just let the tests run, but see:
 	 * http://team.ops4j.org/browse/PAXEXAM-288
 	 */
-	
+
 	private static boolean objectsAreBuilt = false;
 
 	@Before
@@ -51,6 +58,37 @@ public class ITestGetIndexingMetadata extends GenericTest {
 			new BuildFedoraObjects().buildObjects();
 		}
 		objectsAreBuilt = true;
+	}
+
+	/*
+	 * Same-ish deal here: we need to make sure that Beverly herself is up and
+	 * running before testing her.
+	 */
+
+	private static boolean beverlyIsRunning = false;
+
+	@Before
+	@SneakyThrows(InvalidSyntaxException.class)
+	public void checkBeverly() throws InterruptedException {
+		if (!beverlyIsRunning) {
+			ServiceTracker tracker = new ServiceTracker(
+					context,
+					context.createFilter("(camel.context.name=repository-indexer)"),
+					null);
+			tracker.open();
+			tracker.waitForService(0);
+			CamelContext camel = (CamelContext) tracker.getService();
+			// now we know that Beverly is running
+			camel = null;
+			context.ungetService(tracker.getServiceReference());
+			tracker.close();
+		}
+		beverlyIsRunning = true;
+	}
+
+	//@Test
+	public void hangFire() {
+		pause();
 	}
 
 	@Test
@@ -78,16 +116,16 @@ public class ITestGetIndexingMetadata extends GenericTest {
 			log("Testing for existence of Indexable service definition...");
 			url = new URL(repo1Url + "/objects/indexable:sdef");
 			conn = (HttpURLConnection) url.openConnection();
-			assertEquals("Indexable service definition was not available!", 200,
-					conn.getResponseCode());
+			assertEquals("Indexable service definition was not available!",
+					200, conn.getResponseCode());
 			log("Found Indexable service definition.");
 		}
 		{
 			log("Testing for existence of Indexable service deployment...");
 			url = new URL(repo1Url + "/objects/indexable:sdep");
 			conn = (HttpURLConnection) url.openConnection();
-			assertEquals("Indexable service deployment was not available!", 200,
-					conn.getResponseCode());
+			assertEquals("Indexable service deployment was not available!",
+					200, conn.getResponseCode());
 			log("Found Indexable service deployment.");
 		}
 		{
@@ -147,6 +185,12 @@ public class ITestGetIndexingMetadata extends GenericTest {
 		nodes = doc.getElementsByTagName("doc");
 		assertEquals("Not exactly one <doc/> element in " + test1dissemination
 				+ " results!", nodes.getLength(), 1);
+	}
+
+	@SneakyThrows
+	private void pause() {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in) );
+	    String sample = br.readLine();
 	}
 
 }

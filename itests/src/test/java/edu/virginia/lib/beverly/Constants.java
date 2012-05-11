@@ -8,7 +8,7 @@ public class Constants {
 	
 	final protected static String test1 = "test:1";
 	final protected static String test1dissemination = repo1Url + "/objects/"
-			+ test1 + "/" + indexSDef + "/" + indexMethod;
+			+ test1 + "/methods/" + indexSDef + "/" + indexMethod;
 
 	final protected static String test2 = "test:2";
 	final protected static String test2dissemination = repo1Url + "/objects/"

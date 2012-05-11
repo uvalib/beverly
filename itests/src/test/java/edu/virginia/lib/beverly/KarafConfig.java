@@ -7,6 +7,7 @@ import static org.ops4j.pax.exam.CoreOptions.*;
 
 import java.io.File;
 
+import org.openengsb.labs.paxexam.karaf.options.KarafDistributionConfigurationFilePutOption;
 import org.openengsb.labs.paxexam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.Option;
 
@@ -24,9 +25,8 @@ public class KarafConfig {
 				// junitBundles(),
 				compendiumProfile(),
 				// just in case we want to look at debris, we should keep the
-				// container: let 'mvn clean' clean up if needed.
-				keepRuntimeFolder(),
-				logLevel(LogLevel.DEBUG),
+				// containers: let 'mvn clean' clean up if needed.
+				keepRuntimeFolder(), logLevel(LogLevel.DEBUG),
 				// the tests use Guava to simplify some collections jazz
 				mavenBundle("com.google.guava", "guava").versionAsInProject(),
 				// of course, Beverly needs an MQ plant
@@ -38,5 +38,4 @@ public class KarafConfig {
 						.type("xml").classifier("features"),
 						"repository-indexing") };
 	}
-
 }

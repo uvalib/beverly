@@ -12,6 +12,7 @@
         <feature version="2.9.1">camel-saxon</feature>
         <feature version="2.9.1">camel-blueprint</feature>
         <feature version="2.9.1">camel-http</feature>
+        <feature version="2.9.1">camel-http4</feature>
         <feature version="2.9.1">camel-jms</feature>
         <feature version="2.9.1">camel-jetty</feature>
         <feature version="2.9.1">camel-freemarker</feature>

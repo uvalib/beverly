@@ -43,9 +43,6 @@ public class ITestThatBeverlyExists extends GenericTest {
 	@Filter(value = "osgi.blueprint.container.symbolicname=edu.virginia.lib.repository-indexing", timeout = 20000)
 	BlueprintContainer blueprint;
 	
-	@Inject
-	private BundleContext context;
-	
 	private ServiceTracker tracker;
 	
 	@Inject

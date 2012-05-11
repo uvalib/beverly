@@ -26,7 +26,7 @@ public class BuildFedoraObjects {
 	final private static String repo1ObjectsUrlString = repo1Url
 			+ "/objects/new";
 
-	@SneakyThrows()
+	@SneakyThrows
 	protected void buildObjects() {
 
 		log("Building and ingesting Fedora object into " + repo1Url);
