@@ -256,7 +256,7 @@
               <simple>${headers.stylesheetUrl}</simple>
             </setHeader>
             <log message="About to run a single-datastream transform"></log>
-            <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory"/>
+            <inOut uri="xslt:xslt/atomtosoap.xsl?transformerFactory=tFactory&amp;uriResolver=httpUriResolver"/>
             <removeHeader headerName="CamelXsltResourceUri"/>
           </split>
           <inOut uri="xslt:xslt/mergeAndDeduplicateSolr.xsl?transformerFactory=tFactory"/>
@@ -354,6 +354,8 @@
   </bean>  
 
   <bean id="tFactory" class="net.sf.saxon.TransformerFactoryImpl"/>  
+  
+  <bean id="httpUriResolver" class="edu.virginia.lib.camel.builder.xslt.HttpXsltUriResolver" />
 
   <reference id="log" interface="org.osgi.service.log.LogService"/>
 
