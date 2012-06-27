@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>
-        Starting an ActiveMQ broker in Karaf</title>
+        Using Tika</title>
     <link rel="stylesheet" href="../css/apache-maven-fluido.min.css" />
     <link rel="stylesheet" href="../css/site.css" />
     <link rel="stylesheet" href="../css/print.css" media="print" />
@@ -98,16 +98,31 @@
                               
           
     
-        <div class="section"><h2>Starting an ActiveMQ broker in Karaf<a name="Starting_an_ActiveMQ_broker_in_Karaf"></a></h2>
-            <p>Using the Karaf shell:
-                    </p><div class="source"><pre class="prettyprint">
-                        karaf&gt; features:addurl  http://repo1.maven.org/maven2/org/apache/activemq/activemq-karaf/5.5.1/activemq-karaf-5.5.1-features.xml
-                        karaf&gt; features:install activemq-blueprint
-                        karaf&gt; activemq:create-broker -t blueprint
-                    </pre></div>
+        <div class="section"><h2>When is Tika engaged?<a name="When_is_Tika_engaged"></a></h2>
+            <p>
+                Tika is brought into play when a datastream is determined to have a MIME-type other than those
+                recorded in the configuration setting &quot;xmlTypes&quot;. This is based entirely on Fedora's determination, so 
+                it is necessary to record accurate MIME-types for datastreams in the repositories.
+            </p>
+        </div>
+        <div class="section"><h2>What does Tika do?<a name="What_does_Tika_do"></a></h2>
+            <p><a class="externalLink" href="https://tika.apache.org">Apache Tika</a> is used to extract metadata from
+            non-XML datastreams. When such are presented to Beverly (by being referenced in RELS-INT
+            of an indexable object) they are first presented to Tika and what metadata Tika can
+            extract are serialized in XML form. Each field is put into an XML element of that
+            name and all of them are wrapped in a &quot;Metadata&quot; element. For example:
+                </p><div class="source"><pre class="prettyprint">
+                    &lt;Metadata&gt;
+                        &lt;Content-Type&gt;image/jpeg&lt;/Content-Type&gt;
+                    &lt;Metadata/&gt;
+                </pre></div>
+                XSLT can then act on this result in the same way as on XML metadata.
             
-            <p>By default, JMS/Openwire (as is used by Fedora's <a class="externalLink" href="https://wiki.duraspace.org/display/FEDORA35/Messaging">messaging service</a>)
-                traffic will be serviced by this new broker at port 61616.</p>
+        </div>
+        <div class="section"><h2>What will Tika give you?<a name="What_will_Tika_give_you"></a></h2>
+            <p>That's up to Tika. Tika will extract what it can from any bitstream with which it is presented
+            with no more clue than the MIME-type that Fedora provides. For more information on what Tika can do, 
+                <a class="externalLink" href="https://tika.apache.org/1.1/formats.html">check it out</a>.</p>
         </div>
     
 
